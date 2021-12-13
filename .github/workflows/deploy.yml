@@ -27,7 +27,7 @@ jobs:
     - name: Beanstalk Deploy
   # You may pin to the exact commit or the version.
   # uses: einaregilsson/beanstalk-deploy@2fcd415f492b2a2ceaada75e602401b5a28c8cd6
-  uses: einaregilsson/beanstalk-deploy@v19
+  - uses: einaregilsson/beanstalk-deploy@v19
   with:
     # AWS Access Key
     aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
