@@ -41,7 +41,7 @@ public class DialogFlowIntents extends DialogflowApp {
 	@Autowired
 	private AppointmentService appointmentService;
 
-	@ForIntent("Identificarme Intent")
+	@ForIntent("user.identify")
 	public ActionResponse identificateUserIntent(ActionRequest request) {
 
 		// Read request parameter
@@ -75,7 +75,7 @@ public class DialogFlowIntents extends DialogflowApp {
 		return actionResponse;
 	}
 
-	@ForIntent("Mi Próxima Cita Intent")
+	@ForIntent("appointment.query")
 	public ActionResponse rememberAppointmentIntent(ActionRequest request) {
 
 		// Read context parameter
@@ -106,7 +106,7 @@ public class DialogFlowIntents extends DialogflowApp {
 		return actionResponse;
 	}
 
-	@ForIntent("Solicitar Cita Intent")
+	@ForIntent("appointment.request")
 	public ActionResponse queryAvaliabilityIntent(ActionRequest request) {
 
 		LocalDateTime slot = appointmentService.findNextAvailableSlot(AppointmentType.FACE_TO_FACE);
@@ -128,7 +128,7 @@ public class DialogFlowIntents extends DialogflowApp {
 
 	}
 
-	@ForIntent("Solicitar Cita Intent - yes")
+	@ForIntent("appointment.request - yes")
 	public ActionResponse confirmAppointmentIntent(ActionRequest request) {
 
 		// Read user id from the context
@@ -165,7 +165,7 @@ public class DialogFlowIntents extends DialogflowApp {
 
 	}
 
-	@ForIntent("Solicitar Cita Intent - no")
+	@ForIntent("appointment.request - no")
 	public ActionResponse cancelAppointmentIntent(ActionRequest request) {
 
 		ResponseBuilder builder = getResponseBuilder(request);
