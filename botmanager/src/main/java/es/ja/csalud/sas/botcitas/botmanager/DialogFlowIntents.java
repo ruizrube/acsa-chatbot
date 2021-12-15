@@ -128,7 +128,7 @@ public class DialogFlowIntents extends DialogflowApp {
 
 	}
 
-	@ForIntent("appointment.request - yes")
+	@ForIntent("appointment.request.yes")
 	public ActionResponse confirmAppointmentIntent(ActionRequest request) {
 
 		// Read user id from the context
@@ -165,7 +165,7 @@ public class DialogFlowIntents extends DialogflowApp {
 
 	}
 
-	@ForIntent("appointment.request - no")
+	@ForIntent("appointment.request.no")
 	public ActionResponse cancelAppointmentIntent(ActionRequest request) {
 
 		ResponseBuilder builder = getResponseBuilder(request);
