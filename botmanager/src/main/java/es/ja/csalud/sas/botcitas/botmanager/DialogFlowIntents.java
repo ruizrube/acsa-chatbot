@@ -30,10 +30,6 @@ import es.ja.csalud.sas.botcitas.botmanager.user.UserService;
 @Component
 public class DialogFlowIntents extends DialogflowApp {
 
-	private static final String NO_USER_MSG = "Lo siento, pero no te tengo registrado en el sistema de salud";
-
-	private static final String NO_APPOINTMENT_MSG = "Lo siento, pero a esa hora no hay disponibilidad de cita con su doctor";
-
 	private DateTimeFormatter isoDateFormatter = DateTimeFormatter.ISO_DATE_TIME;
 
 	@Autowired
@@ -45,7 +41,7 @@ public class DialogFlowIntents extends DialogflowApp {
 	public ActionResponse identificateUserIntent(ActionRequest request) {
 
 		// Read request parameter
-		String identityDocument = (String) request.getParameter("identityDocument");
+		String identityDocument = (String) request.getParameter("identityDocument"); //$NON-NLS-1$
 
 		Optional<User> user = userService.findById(identityDocument);
 		ResponseBuilder builder;
@@ -53,25 +49,25 @@ public class DialogFlowIntents extends DialogflowApp {
 
 			// Write response
 			builder = getResponseBuilder(request);
-			builder.add(
-					"Hola " + user.get().getFirstName() + " " + user.get().getLastName() + ". ¿Cómo puedo ayudarte?");
+			builder.add(AgentResponses.getString("Responses.GREETING") + user.get().getName() //$NON-NLS-1$
+					+ AgentResponses.getString("Responses.HELP")); //$NON-NLS-1$
 
 			// Set output context and its parameters
-			ActionContext context = new ActionContext("ctx-useridentified", 10);
+			ActionContext context = new ActionContext("ctx-useridentified", 10); //$NON-NLS-1$
 			Map<String, String> params = new HashMap<String, String>();
-			params.put("identityDocument", user.get().getIdentityDocument());
-			params.put("userName", user.get().getFirstName());
+			params.put("identityDocument", user.get().getIdentityDocument()); //$NON-NLS-1$
+			params.put("userName", user.get().getFirstName()); //$NON-NLS-1$
 			context.setParameters(params);
 			builder.add(context);
 
 		} else {
 
 			builder = getResponseBuilder(request);
-			builder.add(NO_USER_MSG);
+			builder.add(AgentResponses.getString("Responses.NO_USER")); //$NON-NLS-1$
 		}
 
 		ActionResponse actionResponse = builder.build();
-		
+
 		return actionResponse;
 	}
 
@@ -79,8 +75,8 @@ public class DialogFlowIntents extends DialogflowApp {
 	public ActionResponse rememberAppointmentIntent(ActionRequest request) {
 
 		// Read context parameter
-		ActionContext context = request.getContext("ctx-useridentified");
-		String identityNumber = (String) context.getParameters().get("identityDocument");
+		ActionContext context = request.getContext("ctx-useridentified"); //$NON-NLS-1$
+		String identityNumber = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
 
 		ResponseBuilder builder;
 
@@ -90,16 +86,17 @@ public class DialogFlowIntents extends DialogflowApp {
 			if (appointmentOpt.isPresent()) {
 				Appointment appointment = appointmentOpt.get();
 				builder = getResponseBuilder(request);
-				builder.add("Su próxima cita es el día " + renderDateTime(appointment.getDateTime()));
+				builder.add(
+						AgentResponses.getString("Responses.NEXT_APPOINTMENT") + renderDateTime(appointment.getDateTime())); //$NON-NLS-1$
 
 			} else {
 
 				builder = getResponseBuilder(request);
-				builder.add("No tiene ninguna cita");
+				builder.add(AgentResponses.getString("Responses.NO_APPOINTMENT")); //$NON-NLS-1$
 			}
 		} catch (UserNotFoundException e) {
 			builder = getResponseBuilder(request);
-			builder.add(NO_USER_MSG);
+			builder.add(AgentResponses.getString("Responses.NO_USER")); //$NON-NLS-1$
 		}
 
 		ActionResponse actionResponse = builder.build();
@@ -113,13 +110,13 @@ public class DialogFlowIntents extends DialogflowApp {
 
 		ResponseBuilder builder = getResponseBuilder(request);
 
-		builder.add("La siguiente fecha disponible es el día " + renderDateTime(slot)
-				+ ". ¿Te gustaría solicitar una cita para ese día?");
+		builder.add(AgentResponses.getString("Responses.NEXT_SLOT") + renderDateTime(slot) //$NON-NLS-1$
+				+ AgentResponses.getString("Responses.CONFIRM_APPOINTMENT")); //$NON-NLS-1$
 
 		// Set output context
-		ActionContext context = new ActionContext("ctx-slotproposed", 5);
+		ActionContext context = new ActionContext("ctx-slotproposed", 5); //$NON-NLS-1$
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("dateTime", slot.format(isoDateFormatter));
+		params.put("dateTime", slot.format(isoDateFormatter)); //$NON-NLS-1$
 		context.setParameters(params);
 		builder.add(context);
 
@@ -132,16 +129,16 @@ public class DialogFlowIntents extends DialogflowApp {
 	public ActionResponse confirmAppointmentIntent(ActionRequest request) {
 
 		// Read user id from the context
-		ActionContext context = request.getContext("ctx-useridentified");
-		String identityNumber = (String) context.getParameters().get("identityDocument");
+		ActionContext context = request.getContext("ctx-useridentified"); //$NON-NLS-1$
+		String identityNumber = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
 
 		// Read date time from the context
-		context = request.getContext("ctx-slotproposed");
-		LocalDateTime dateTime = readDateTime(context.getParameters().get("dateTime"));
+		context = request.getContext("ctx-slotproposed"); //$NON-NLS-1$
+		LocalDateTime dateTime = readDateTime(context.getParameters().get("dateTime")); //$NON-NLS-1$
 
 		// Read appointmentType and subject from the request
-		AppointmentType appointmentType = AppointmentType.valueOf((String) request.getParameter("appointmentType"));
-		String subject = (String) request.getParameter("subject");
+		AppointmentType appointmentType = AppointmentType.valueOf((String) request.getParameter("appointmentType")); //$NON-NLS-1$
+		String subject = (String) request.getParameter("subject"); //$NON-NLS-1$
 
 		ResponseBuilder builder = getResponseBuilder(request);
 
@@ -150,13 +147,14 @@ public class DialogFlowIntents extends DialogflowApp {
 
 			appointment = appointmentService.confirmAppointment(identityNumber, dateTime, appointmentType, subject);
 
-			builder.add("Le confirmo que su próxima cita es el día " + renderDateTime(appointment.getDateTime()));
-			builder.removeContext("ctx-slotproposed");
+			builder.add(AgentResponses.getString("Responses.APPOINTMENT_CONFIRMATION") //$NON-NLS-1$
+					+ renderDateTime(appointment.getDateTime()));
+			builder.removeContext("ctx-slotproposed"); //$NON-NLS-1$
 
 		} catch (UserNotFoundException e) {
-			builder.add(NO_USER_MSG);
+			builder.add(AgentResponses.getString("Responses.NO_USER")); //$NON-NLS-1$
 		} catch (AppointmentNotAvailableException e) {
-			builder.add(NO_APPOINTMENT_MSG);
+			builder.add(AgentResponses.getString("Responses.NO_SLOT")); //$NON-NLS-1$
 		}
 
 		ActionResponse actionResponse = builder.build();
@@ -169,7 +167,7 @@ public class DialogFlowIntents extends DialogflowApp {
 	public ActionResponse cancelAppointmentIntent(ActionRequest request) {
 
 		ResponseBuilder builder = getResponseBuilder(request);
-		builder.removeContext("ctx-slotproposed");
+		builder.removeContext("ctx-slotproposed"); //$NON-NLS-1$
 		ActionResponse actionResponse = builder.build();
 
 		return actionResponse;
@@ -178,13 +176,13 @@ public class DialogFlowIntents extends DialogflowApp {
 
 	private String renderDateTime(LocalDateTime dateTime) {
 		// TODO Auto-generated method stub
-		return dateTime.getDayOfMonth() + " de "
-				+ dateTime.getMonth().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es")) + " a las "
-				+ dateTime.getHour() + " horas y " + dateTime.getMinute() + " minutos";
+		return dateTime.getDayOfMonth() + " de " //$NON-NLS-1$
+				+ dateTime.getMonth().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es")) + " a las " //$NON-NLS-1$ //$NON-NLS-2$
+				+ dateTime.getHour() + " horas y " + dateTime.getMinute() + " minutos"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	private LocalDateTime readDateTime(Object parameter) {
-		String value = "";
+		String value = ""; //$NON-NLS-1$
 		if (parameter instanceof LinkedTreeMap) {
 			LinkedTreeMap map = (LinkedTreeMap) parameter;
 			value = (String) map.values().stream().findFirst().get();

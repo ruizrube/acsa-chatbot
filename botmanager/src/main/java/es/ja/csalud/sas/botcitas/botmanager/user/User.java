@@ -46,6 +46,10 @@ public class User {
 		this.identityDocument = identityDocument;
 	}
 
+	public String getName() {
+		return firstName + " " + lastName;
+	}
+
 	public String getFirstName() {
 		return firstName;
 	}
