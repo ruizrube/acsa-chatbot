@@ -21,6 +21,9 @@ public class User {
 	private String lastName;
 	private String nuhsa;
 	private String identityDocument;
+	private boolean enabled;
+	private boolean acceptConditions;
+		
 
 	@ManyToOne
 	@JsonIgnore
@@ -72,6 +75,22 @@ public class User {
 
 	public void setDoctor(User doctor) {
 		this.doctor = doctor;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	public boolean isAcceptConditions() {
+		return acceptConditions;
+	}
+
+	public void setAcceptConditions(boolean acceptConditions) {
+		this.acceptConditions = acceptConditions;
 	}
 
 }

@@ -17,6 +17,9 @@ import com.google.actions.api.ActionResponse;
 import com.google.actions.api.DialogflowApp;
 import com.google.actions.api.ForIntent;
 import com.google.actions.api.response.ResponseBuilder;
+import com.google.api.services.actions_fulfillment.v2.model.StructuredResponse;
+import com.google.api.services.dialogflow_fulfillment.v2.model.EventInput;
+import com.google.api.services.dialogflow_fulfillment.v2.model.WebhookResponse;
 import com.google.gson.internal.LinkedTreeMap;
 
 import es.ja.csalud.sas.botcitas.botmanager.appoinment.Appointment;
@@ -30,6 +33,12 @@ import es.ja.csalud.sas.botcitas.botmanager.user.UserService;
 @Component
 public class DialogFlowIntents extends DialogflowApp {
 
+	private static final String CONTEXT_USER_IDENTIFIED = "user-identified";
+
+	private static final String CONTEXT_USER_ACTIVATED = "user-activated";
+
+	private static final String CONTEXT_USER_CONSENT = "user-consent";
+
 	private DateTimeFormatter isoDateFormatter = DateTimeFormatter.ISO_DATE_TIME;
 
 	@Autowired
@@ -37,45 +46,176 @@ public class DialogFlowIntents extends DialogflowApp {
 	@Autowired
 	private AppointmentService appointmentService;
 
+	/**
+	 * Webhook for the intention of identify the user
+	 * 
+	 * @param request
+	 * @return
+	 */
 	@ForIntent("user.identify")
 	public ActionResponse identificateUserIntent(ActionRequest request) {
+		ResponseBuilder builder = getResponseBuilder(request);
 
 		// Read request parameter
 		String identityDocument = (String) request.getParameter("identityDocument"); //$NON-NLS-1$
 
 		Optional<User> user = userService.findById(identityDocument);
-		ResponseBuilder builder;
 		if (user.isPresent()) {
 
-			// Write response
-			builder = getResponseBuilder(request);
-			builder.add(AgentResponses.getString("Responses.GREETING") + user.get().getName() //$NON-NLS-1$
-					+ AgentResponses.getString("Responses.HELP")); //$NON-NLS-1$
-
-			// Set output context and its parameters
-			ActionContext context = new ActionContext("ctx-useridentified", 10); //$NON-NLS-1$
+			ActionContext userIdentifiedContext = new ActionContext(CONTEXT_USER_IDENTIFIED, 10); // $NON-NLS-1$
 			Map<String, String> params = new HashMap<String, String>();
 			params.put("identityDocument", user.get().getIdentityDocument()); //$NON-NLS-1$
 			params.put("userName", user.get().getFirstName()); //$NON-NLS-1$
-			context.setParameters(params);
-			builder.add(context);
+			userIdentifiedContext.setParameters(params);
+		
+			builder.add(userIdentifiedContext);
+
+			if (user.get().isEnabled()) {
+
+				// Set output context and its parameters
+				ActionContext userActivatedContext = new ActionContext(CONTEXT_USER_ACTIVATED, 10); // $NON-NLS-1$
+				builder.add(userActivatedContext);
+
+				if (user.get().isAcceptConditions()) {
+					// Write response
+					builder.add(AgentResponses.getString("Responses.GREETING") + user.get().getName() //$NON-NLS-1$
+							+ AgentResponses.getString("Responses.HELP")); //$NON-NLS-1$
+
+					ActionContext userConsentContext = new ActionContext(CONTEXT_USER_CONSENT, 10); // $NON-NLS-1$
+					builder.add(userConsentContext);
+
+				} else {
+					builder.add(AgentResponses.getString("Responses.USER_NOT_ACCEPTED_CONDITIONS")); //$NON-NLS-1$
+
+				}
+
+			} else {
+				builder.add(AgentResponses.getString("Responses.USER_NOT_ENABLED")); //$NON-NLS-1$
+			}
 
 		} else {
 
-			builder = getResponseBuilder(request);
+			builder.add(AgentResponses.getString("Responses.NO_USER")); //$NON-NLS-1$
+			builder.setExpectUserResponse$actions_on_google(false);
+		}
+
+		ActionResponse actionResponse = builder.build();
+		return actionResponse;
+	}
+
+	/**
+	 * Webhook for the followup intent when the user responds yes to the oportunity
+	 * to activate him/herself or accept the usage conditions
+	 * 
+	 * @param request
+	 * @return
+	 */
+	@ForIntent("user.identify - yes")
+	public ActionResponse identificateUserFollowupIntent(ActionRequest request) {
+		ResponseBuilder builder = getResponseBuilder(request);
+
+		// Read context parameter
+
+		ActionContext userActivatedContext = request.getContext(CONTEXT_USER_ACTIVATED); // $NON-NLS-1$
+		if (userActivatedContext != null) { // Si el usuario está activo entonces lo que quiere es aceptar las
+											// condiciones de uso
+			triggerCustomEvent(builder, "CONSENT");
+
+		} else { // Si no está activo, entonces lo que quiere es activarlo
+			triggerCustomEvent(builder, "ACTIVATE");
+		}
+
+		ActionResponse actionResponse = builder.build();
+
+		return actionResponse;
+
+	}
+
+	/**
+	 * Webhook for the followup intent when the user responds yes to accept the
+	 * usage conditions
+	 * 
+	 * @param request
+	 * @return
+	 */
+	@ForIntent("user.consent - yes")
+	public ActionResponse consentUsageConditionsFollowupIntent(ActionRequest request) {
+		ResponseBuilder builder = getResponseBuilder(request);
+
+		// Read context parameter
+		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
+		String identityDocument = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
+
+		Optional<User> user = userService.findById(identityDocument);
+		if (user.isPresent()) {
+			User theUser = user.get();
+			theUser.setAcceptConditions(true);
+			userService.save(theUser);
+			builder.add(AgentResponses.getString("Responses.USER_ACCEPTED_CONDITIONS")); //$NON-NLS-1$
+		} else {
 			builder.add(AgentResponses.getString("Responses.NO_USER")); //$NON-NLS-1$
 		}
 
 		ActionResponse actionResponse = builder.build();
 
 		return actionResponse;
+
+	}
+
+	
+	/**
+	 * Webhook for activate usage conditions. This has to be extended to support some authentication method
+	 * 
+	 * @param request
+	 * @return
+	 */
+	@ForIntent("user.activate")
+	public ActionResponse activateUserIntent(ActionRequest request) {
+		ResponseBuilder builder = getResponseBuilder(request);
+
+		// Read context parameter
+		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
+		String identityDocument = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
+
+		Optional<User> user = userService.findById(identityDocument);
+		if (user.isPresent()) {
+			User theUser = user.get();
+			theUser.setEnabled(true);
+			userService.save(theUser);
+			builder.add(AgentResponses.getString("Responses.USER_ACTIVATED")); //$NON-NLS-1$
+		} else {
+			builder.add(AgentResponses.getString("Responses.NO_USER")); //$NON-NLS-1$
+		}
+
+		ActionResponse actionResponse = builder.build();
+
+		return actionResponse;
+
+	}
+	
+	
+	
+	/**
+	 * Method to return in the response body the event name to be triggered in
+	 * Dialogflow
+	 * 
+	 * @param builder
+	 * @param eventName
+	 */
+	private void triggerCustomEvent(ResponseBuilder builder, String eventName) {
+		WebhookResponse webhookResponse = new WebhookResponse();
+		EventInput eventInput = new EventInput();
+		eventInput.setName(eventName);
+		webhookResponse.setFollowupEventInput(eventInput);
+		builder.setWebhookResponse$actions_on_google(webhookResponse);
+
 	}
 
 	@ForIntent("appointment.query")
 	public ActionResponse rememberAppointmentIntent(ActionRequest request) {
 
 		// Read context parameter
-		ActionContext context = request.getContext("ctx-useridentified"); //$NON-NLS-1$
+		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
 		String identityNumber = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
 
 		ResponseBuilder builder;
@@ -86,8 +226,8 @@ public class DialogFlowIntents extends DialogflowApp {
 			if (appointmentOpt.isPresent()) {
 				Appointment appointment = appointmentOpt.get();
 				builder = getResponseBuilder(request);
-				builder.add(
-						AgentResponses.getString("Responses.NEXT_APPOINTMENT") + renderDateTime(appointment.getDateTime())); //$NON-NLS-1$
+				builder.add(AgentResponses.getString("Responses.NEXT_APPOINTMENT") //$NON-NLS-1$
+						+ renderDateTime(appointment.getDateTime()));
 
 			} else {
 
@@ -114,7 +254,7 @@ public class DialogFlowIntents extends DialogflowApp {
 				+ AgentResponses.getString("Responses.CONFIRM_APPOINTMENT")); //$NON-NLS-1$
 
 		// Set output context
-		ActionContext context = new ActionContext("ctx-slotproposed", 5); //$NON-NLS-1$
+		ActionContext context = new ActionContext("slotproposed", 5); //$NON-NLS-1$
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("dateTime", slot.format(isoDateFormatter)); //$NON-NLS-1$
 		context.setParameters(params);
@@ -129,11 +269,11 @@ public class DialogFlowIntents extends DialogflowApp {
 	public ActionResponse confirmAppointmentIntent(ActionRequest request) {
 
 		// Read user id from the context
-		ActionContext context = request.getContext("ctx-useridentified"); //$NON-NLS-1$
+		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
 		String identityNumber = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
 
 		// Read date time from the context
-		context = request.getContext("ctx-slotproposed"); //$NON-NLS-1$
+		context = request.getContext("slotproposed"); //$NON-NLS-1$
 		LocalDateTime dateTime = readDateTime(context.getParameters().get("dateTime")); //$NON-NLS-1$
 
 		// Read appointmentType and subject from the request
@@ -149,7 +289,7 @@ public class DialogFlowIntents extends DialogflowApp {
 
 			builder.add(AgentResponses.getString("Responses.APPOINTMENT_CONFIRMATION") //$NON-NLS-1$
 					+ renderDateTime(appointment.getDateTime()));
-			builder.removeContext("ctx-slotproposed"); //$NON-NLS-1$
+			builder.removeContext("slotproposed"); //$NON-NLS-1$
 
 		} catch (UserNotFoundException e) {
 			builder.add(AgentResponses.getString("Responses.NO_USER")); //$NON-NLS-1$
@@ -167,7 +307,7 @@ public class DialogFlowIntents extends DialogflowApp {
 	public ActionResponse cancelAppointmentIntent(ActionRequest request) {
 
 		ResponseBuilder builder = getResponseBuilder(request);
-		builder.removeContext("ctx-slotproposed"); //$NON-NLS-1$
+		builder.removeContext("slotproposed"); //$NON-NLS-1$
 		ActionResponse actionResponse = builder.build();
 
 		return actionResponse;
