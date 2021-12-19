@@ -7,6 +7,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentService;
+import es.ja.csalud.sas.botcitas.botmanager.clinic.Clinic;
+import es.ja.csalud.sas.botcitas.botmanager.clinic.ClinicService;
 import es.ja.csalud.sas.botcitas.botmanager.user.User;
 import es.ja.csalud.sas.botcitas.botmanager.user.UserService;
 
@@ -16,6 +18,9 @@ public class BotManagerApplication implements CommandLineRunner {
 
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private ClinicService clinicService;
 
 	@Autowired
 	private AppointmentService appointmentService;
@@ -33,6 +38,14 @@ public class BotManagerApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 
+		if (clinicService.count() == 0) {
+			Clinic clinic= new Clinic();
+			clinic.setCity("Cádiz");
+			clinic.setPhone("956956956");
+			clinic.setAddress("Hidroavión Numancia, 0");
+			clinic = clinicService.save(clinic);
+		}
+		
 		if (userService.count() == 0) {
 			User doctor = new User();
 			doctor.setFirstName("Doctor");

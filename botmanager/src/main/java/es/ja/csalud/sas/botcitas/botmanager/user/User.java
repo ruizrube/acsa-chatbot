@@ -1,5 +1,7 @@
 package es.ja.csalud.sas.botcitas.botmanager.user;
 
+import java.util.Optional;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -8,6 +10,8 @@ import javax.persistence.ManyToOne;
 import org.hibernate.annotations.GenericGenerator;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import es.ja.csalud.sas.botcitas.botmanager.clinic.Clinic;
 
 @Entity
 public class User {
@@ -23,7 +27,9 @@ public class User {
 	private String identityDocument;
 	private boolean enabled;
 	private boolean acceptConditions;
-		
+
+	@ManyToOne
+	private Clinic clinic;
 
 	@ManyToOne
 	@JsonIgnore
@@ -91,6 +97,14 @@ public class User {
 
 	public void setAcceptConditions(boolean acceptConditions) {
 		this.acceptConditions = acceptConditions;
+	}
+
+	public Optional<Clinic> getClinic() {
+		return Optional.ofNullable(clinic);
+	}
+
+	public void setClinic(Optional<Clinic> clinic) {
+		this.clinic = clinic.get();
 	}
 
 }

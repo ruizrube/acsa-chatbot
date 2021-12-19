@@ -17,7 +17,6 @@ import com.google.actions.api.ActionResponse;
 import com.google.actions.api.DialogflowApp;
 import com.google.actions.api.ForIntent;
 import com.google.actions.api.response.ResponseBuilder;
-import com.google.api.services.actions_fulfillment.v2.model.StructuredResponse;
 import com.google.api.services.dialogflow_fulfillment.v2.model.EventInput;
 import com.google.api.services.dialogflow_fulfillment.v2.model.WebhookResponse;
 import com.google.gson.internal.LinkedTreeMap;
@@ -26,6 +25,8 @@ import es.ja.csalud.sas.botcitas.botmanager.appoinment.Appointment;
 import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentNotAvailableException;
 import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentService;
 import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentType;
+import es.ja.csalud.sas.botcitas.botmanager.clinic.Clinic;
+import es.ja.csalud.sas.botcitas.botmanager.clinic.ClinicService;
 import es.ja.csalud.sas.botcitas.botmanager.user.User;
 import es.ja.csalud.sas.botcitas.botmanager.user.UserNotFoundException;
 import es.ja.csalud.sas.botcitas.botmanager.user.UserService;
@@ -45,6 +46,9 @@ public class DialogFlowIntents extends DialogflowApp {
 	private UserService userService;
 	@Autowired
 	private AppointmentService appointmentService;
+
+	@Autowired
+	private ClinicService clinicService;
 
 	/**
 	 * Webhook for the intention of identify the user
@@ -67,7 +71,7 @@ public class DialogFlowIntents extends DialogflowApp {
 			params.put("identityDocument", user.get().getIdentityDocument()); //$NON-NLS-1$
 			params.put("userName", user.get().getFirstName()); //$NON-NLS-1$
 			userIdentifiedContext.setParameters(params);
-		
+
 			builder.add(userIdentifiedContext);
 
 			if (user.get().isEnabled()) {
@@ -78,8 +82,8 @@ public class DialogFlowIntents extends DialogflowApp {
 
 				if (user.get().isAcceptConditions()) {
 					// Write response
-					builder.add(AgentResponses.getString("Responses.GREETING") + user.get().getName() //$NON-NLS-1$
-							+ AgentResponses.getString("Responses.HELP")); //$NON-NLS-1$
+					builder.add(AgentResponses.getString("Responses.GREETING_1") + user.get().getName() //$NON-NLS-1$
+							+ AgentResponses.getString("Responses.GREETING_1")); //$NON-NLS-1$
 
 					ActionContext userConsentContext = new ActionContext(CONTEXT_USER_CONSENT, 10); // $NON-NLS-1$
 					builder.add(userConsentContext);
@@ -162,9 +166,9 @@ public class DialogFlowIntents extends DialogflowApp {
 
 	}
 
-	
 	/**
-	 * Webhook for activate usage conditions. This has to be extended to support some authentication method
+	 * Webhook for activate usage conditions. This has to be extended to support
+	 * some authentication method
 	 * 
 	 * @param request
 	 * @return
@@ -192,22 +196,39 @@ public class DialogFlowIntents extends DialogflowApp {
 		return actionResponse;
 
 	}
-	
-	
-	
-	/**
-	 * Method to return in the response body the event name to be triggered in
-	 * Dialogflow
-	 * 
-	 * @param builder
-	 * @param eventName
-	 */
-	private void triggerCustomEvent(ResponseBuilder builder, String eventName) {
-		WebhookResponse webhookResponse = new WebhookResponse();
-		EventInput eventInput = new EventInput();
-		eventInput.setName(eventName);
-		webhookResponse.setFollowupEventInput(eventInput);
-		builder.setWebhookResponse$actions_on_google(webhookResponse);
+
+	@ForIntent("general.clinic")
+	public ActionResponse retrieveUserClinic(ActionRequest request) {
+
+		ResponseBuilder builder = getResponseBuilder(request);
+
+		// Read context parameter
+		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
+		String identityDocument = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
+
+		Optional<User> user = userService.findById(identityDocument);
+		if (user.isPresent()) {
+			Optional<Clinic> clinic = user.get().getClinic();
+			if (clinic.isPresent()) {
+				Clinic theClinic = clinic.get();
+				
+				String result = AgentResponses.getString("Responses.USER_CLINIC_1") + theClinic.getName()
+						+ AgentResponses.getString("Responses.USER_CLINIC_2") + theClinic.getAddress()
+						+ AgentResponses.getString("Responses.USER_CLINIC_3") + theClinic.getPhone();
+				builder.add(result); // $NON-NLS-1$
+
+			} else {
+				builder.add(AgentResponses.getString("Responses.USER_HAS_NOT_CLINIC")); //$NON-NLS-1$
+
+			}
+
+		} else {
+			builder.add(AgentResponses.getString("Responses.NO_USER")); //$NON-NLS-1$
+		}
+
+		ActionResponse actionResponse = builder.build();
+
+		return actionResponse;
 
 	}
 
@@ -311,6 +332,22 @@ public class DialogFlowIntents extends DialogflowApp {
 		ActionResponse actionResponse = builder.build();
 
 		return actionResponse;
+
+	}
+
+	/**
+	 * Method to return in the response body the event name to be triggered in
+	 * Dialogflow
+	 * 
+	 * @param builder
+	 * @param eventName
+	 */
+	private void triggerCustomEvent(ResponseBuilder builder, String eventName) {
+		WebhookResponse webhookResponse = new WebhookResponse();
+		EventInput eventInput = new EventInput();
+		eventInput.setName(eventName);
+		webhookResponse.setFollowupEventInput(eventInput);
+		builder.setWebhookResponse$actions_on_google(webhookResponse);
 
 	}
 
