@@ -13,25 +13,28 @@ import org.hibernate.annotations.GenericGenerator;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import es.ja.csalud.sas.botcitas.botmanager.clinic.Clinic;
 import es.ja.csalud.sas.botcitas.botmanager.user.User;
 
 @Entity
 public class Appointment {
 
 	@Id
-	@GeneratedValue(generator="system-uuid")
-	@GenericGenerator(name="system-uuid", strategy = "uuid")
+	@GeneratedValue(generator = "system-uuid")
+	@GenericGenerator(name = "system-uuid", strategy = "uuid")
 	private String id;
-	
+
 	@ManyToOne
-    @JsonIgnore
+	@JsonIgnore
 	private User user;
-	
+
 	@ManyToOne
-    @JsonIgnore
+	@JsonIgnore
 	private User assignedDoctor;
-	
-	
+
+	@ManyToOne
+	private Clinic clinic;
+
 	private LocalDateTime dateTime;
 	private String subject;
 
@@ -85,5 +88,15 @@ public class Appointment {
 	public void setAssignedDoctor(User assignedDoctor) {
 		this.assignedDoctor = assignedDoctor;
 	}
+
+	public Clinic getClinic() {
+		return clinic;
+	}
+
+	public void setClinic(Clinic clinic) {
+		this.clinic = clinic;
+	}
+
+
 
 }

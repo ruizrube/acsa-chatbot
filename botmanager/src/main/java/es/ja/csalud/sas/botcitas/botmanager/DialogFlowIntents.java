@@ -83,7 +83,7 @@ public class DialogFlowIntents extends DialogflowApp {
 				if (user.get().isAcceptConditions()) {
 					// Write response
 					builder.add(AgentResponses.getString("Responses.GREETING_1") + user.get().getName() //$NON-NLS-1$
-							+ AgentResponses.getString("Responses.GREETING_1")); //$NON-NLS-1$
+							+ AgentResponses.getString("Responses.GREETING_2")); //$NON-NLS-1$
 
 					ActionContext userConsentContext = new ActionContext(CONTEXT_USER_CONSENT, 10); // $NON-NLS-1$
 					builder.add(userConsentContext);
@@ -247,8 +247,11 @@ public class DialogFlowIntents extends DialogflowApp {
 			if (appointmentOpt.isPresent()) {
 				Appointment appointment = appointmentOpt.get();
 				builder = getResponseBuilder(request);
-				builder.add(AgentResponses.getString("Responses.NEXT_APPOINTMENT") //$NON-NLS-1$
-						+ renderDateTime(appointment.getDateTime()));
+				builder.add(AgentResponses.getString("Responses.NEXT_APPOINTMENT_1") //$NON-NLS-1$
+						+ renderDateTime(appointment.getDateTime())
+						+ AgentResponses.getString("Responses.NEXT_APPOINTMENT_2") 
+						+ appointment.getClinic().getName()
+						);
 
 			} else {
 
