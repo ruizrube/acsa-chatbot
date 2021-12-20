@@ -1,6 +1,8 @@
 package es.ja.csalud.sas.botcitas.botmanager;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.Locale;
@@ -11,7 +13,7 @@ import com.google.api.services.dialogflow_fulfillment.v2.model.EventInput;
 import com.google.api.services.dialogflow_fulfillment.v2.model.WebhookResponse;
 import com.google.gson.internal.LinkedTreeMap;
 
-public class DialogFlowHandler extends DialogflowApp{
+public class DialogFlowHandler extends DialogflowApp {
 
 	protected static final String EVENT_CONSENT = "CONSENT";
 
@@ -43,11 +45,28 @@ public class DialogFlowHandler extends DialogflowApp{
 
 	}
 
-	protected String renderDateTime(LocalDateTime dateTime) {
+	protected String renderDates() {
 		// TODO Auto-generated method stub
-		return dateTime.getDayOfMonth() + " de " //$NON-NLS-1$
-				+ dateTime.getMonth().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es")) + " a las " //$NON-NLS-1$ //$NON-NLS-2$
-				+ dateTime.getHour() + " horas y " + dateTime.getMinute() + " minutos"; //$NON-NLS-1$ //$NON-NLS-2$
+		return "el lunes 1 por la mañana, 2 por la mañana, 3 por la tarde";
+	}
+
+	protected String renderHours() {
+		// TODO Auto-generated method stub
+		return "el lunes 1 a las 08:00, 08:10, 08:20, más tarde u otra fecha, ¿cuál prefieres?";
+	}
+
+	protected String renderDate(LocalDate date) {
+		return "el" + date.getDayOfMonth() + " de " //$NON-NLS-1$
+				+ date.getMonth().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es"));
+	}
+
+	protected String renderTime(LocalTime time) {
+		return " a las " //$NON-NLS-1$ //$NON-NLS-2$
+				+ time.getHour() + " horas y " + time.getMinute() + " minutos"; //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	protected String renderDateTime(LocalDateTime dateTime) {
+		return renderDate(dateTime.toLocalDate()) + renderTime(dateTime.toLocalTime());
 	}
 
 	protected LocalDateTime readDateTime(Object parameter) {

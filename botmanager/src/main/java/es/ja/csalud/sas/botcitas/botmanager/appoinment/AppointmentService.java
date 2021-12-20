@@ -52,6 +52,9 @@ public class AppointmentService {
 		}
 	}
 
+	
+	
+	
 	public Appointment confirmAppointment(String userId, LocalDateTime dateTime, AppointmentType type, String subject)
 			throws UserNotFoundException {
 
@@ -80,6 +83,23 @@ public class AppointmentService {
 
 	}
 
+	
+	public Appointment findById(String id) {
+		return appointmentRepository.findById(id).orElseThrow(() -> new AppointmentNotFoundException(id));
+
+	}
+
+	public List<Appointment> findAll() {
+		return appointmentRepository.findAll();
+	}
+
+	public List<LocalDateTime> findAvailableSlots() {
+		return null;
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
 	public Appointment confirmAppointment(String userId, LocalDateTime dateTime, AppointmentType type)
 			throws UserNotFoundException {
 
@@ -105,13 +125,5 @@ public class AppointmentService {
 
 	}
 
-	public Appointment findById(String id) {
-		return appointmentRepository.findById(id).orElseThrow(() -> new AppointmentNotFoundException(id));
-
-	}
-
-	public List<Appointment> findAll() {
-		// TODO Auto-generated method stub
-		return appointmentRepository.findAll();
-	}
+	
 }
