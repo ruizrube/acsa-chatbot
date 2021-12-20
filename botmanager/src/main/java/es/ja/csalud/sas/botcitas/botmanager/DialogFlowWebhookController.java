@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentIntentHandler;
+import es.ja.csalud.sas.botcitas.botmanager.clinic.ClinicIntentHandler;
+import es.ja.csalud.sas.botcitas.botmanager.user.UserIntentHandler;
+
 @RestController
 public class DialogFlowWebhookController {
 
@@ -17,15 +21,32 @@ public class DialogFlowWebhookController {
 	// LoggerFactory.getLogger(DialogFlowWebhookController.class);
 
 	@Autowired
-	private DialogFlowIntents dialogFlowIntents;
+	private AppointmentIntentHandler appointmentIntentHandler;
+
+	@Autowired
+	private UserIntentHandler userIntentHandler;
+
+	@Autowired
+	private ClinicIntentHandler clinicIntentHandler;
 
 	@RequestMapping(value = "/dialogflow", method = RequestMethod.POST, produces = { "application/json" })
 	String serveAction(@RequestBody String body, @RequestHeader Map<String, String> headers) {
+
 		try {
-			return dialogFlowIntents.handleRequest(body, headers).get();
+			return appointmentIntentHandler.handleRequest(body, headers).get();
 		} catch (InterruptedException | ExecutionException e) {
-			return handleError(e);
+			try {
+				return userIntentHandler.handleRequest(body, headers).get();
+			} catch (InterruptedException | ExecutionException e1) {
+				try {
+					return clinicIntentHandler.handleRequest(body, headers).get();
+				} catch (InterruptedException | ExecutionException e2) {
+					return handleError(e);
+				}
+			}
+
 		}
+
 	}
 
 	private String handleError(Exception e) {
