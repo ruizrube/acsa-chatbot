@@ -34,6 +34,12 @@ import es.ja.csalud.sas.botcitas.botmanager.user.UserService;
 @Component
 public class DialogFlowIntents extends DialogflowApp {
 
+	private static final String EVENT_CONSENT = "CONSENT";
+
+	private static final String EVENT_ACTIVATE = "ACTIVATE";
+
+	private static final String EVENT_REQUEST_APPOINTMENT = "REQUEST_APPOINTMENT";
+
 	private static final String CONTEXT_USER_IDENTIFIED = "user-identified";
 
 	private static final String CONTEXT_USER_ACTIVATED = "user-activated";
@@ -123,10 +129,10 @@ public class DialogFlowIntents extends DialogflowApp {
 		ActionContext userActivatedContext = request.getContext(CONTEXT_USER_ACTIVATED); // $NON-NLS-1$
 		if (userActivatedContext != null) { // Si el usuario está activo entonces lo que quiere es aceptar las
 											// condiciones de uso
-			triggerCustomEvent(builder, "CONSENT");
+			triggerCustomEvent(builder, EVENT_CONSENT);
 
 		} else { // Si no está activo, entonces lo que quiere es activarlo
-			triggerCustomEvent(builder, "ACTIVATE");
+			triggerCustomEvent(builder, EVENT_ACTIVATE);
 		}
 
 		ActionResponse actionResponse = builder.build();
@@ -197,6 +203,12 @@ public class DialogFlowIntents extends DialogflowApp {
 
 	}
 
+	/**
+	 * Webhook for querying the user's clinic
+	 * 
+	 * @param request
+	 * @return
+	 */
 	@ForIntent("general.clinic")
 	public ActionResponse retrieveUserClinic(ActionRequest request) {
 
@@ -211,7 +223,7 @@ public class DialogFlowIntents extends DialogflowApp {
 			Optional<Clinic> clinic = user.get().getClinic();
 			if (clinic.isPresent()) {
 				Clinic theClinic = clinic.get();
-				
+
 				String result = AgentResponses.getString("Responses.USER_CLINIC_1") + theClinic.getName()
 						+ AgentResponses.getString("Responses.USER_CLINIC_2") + theClinic.getAddress()
 						+ AgentResponses.getString("Responses.USER_CLINIC_3") + theClinic.getPhone();
@@ -232,8 +244,14 @@ public class DialogFlowIntents extends DialogflowApp {
 
 	}
 
+	/**
+	 * Webhook for querying the next appointment with the user's doctor
+	 * 
+	 * @param request
+	 * @return
+	 */
 	@ForIntent("appointment.query")
-	public ActionResponse rememberAppointmentIntent(ActionRequest request) {
+	public ActionResponse queryAppointmentIntent(ActionRequest request) {
 
 		// Read context parameter
 		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
@@ -249,9 +267,7 @@ public class DialogFlowIntents extends DialogflowApp {
 				builder = getResponseBuilder(request);
 				builder.add(AgentResponses.getString("Responses.NEXT_APPOINTMENT_1") //$NON-NLS-1$
 						+ renderDateTime(appointment.getDateTime())
-						+ AgentResponses.getString("Responses.NEXT_APPOINTMENT_2") 
-						+ appointment.getClinic().getName()
-						);
+						+ AgentResponses.getString("Responses.NEXT_APPOINTMENT_2") + appointment.getClinic().getName());
 
 			} else {
 
@@ -265,6 +281,25 @@ public class DialogFlowIntents extends DialogflowApp {
 
 		ActionResponse actionResponse = builder.build();
 		return actionResponse;
+	}
+
+	/**
+	 * Webhook for the followup intent when the user responds yes to request for a new appointment
+	 * 
+	 * @param request
+	 * @return
+	 */
+	@ForIntent("appointment.query - yes")
+	public ActionResponse queryAppointmentFollowupIntent(ActionRequest request) {
+		ResponseBuilder builder = getResponseBuilder(request);
+
+		// El usuario no tenia cita asignada y quiere pedir una...
+		triggerCustomEvent(builder, EVENT_REQUEST_APPOINTMENT);
+
+		ActionResponse actionResponse = builder.build();
+
+		return actionResponse;
+
 	}
 
 	@ForIntent("appointment.request")
