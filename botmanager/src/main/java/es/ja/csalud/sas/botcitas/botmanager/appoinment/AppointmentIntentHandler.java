@@ -3,7 +3,10 @@
  */
 package es.ja.csalud.sas.botcitas.botmanager.appoinment;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,29 +41,24 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 	@ForIntent("appointment.query")
 	public ActionResponse queryAppointmentIntent(ActionRequest request) {
 
-		// Read context parameter
+		ResponseBuilder builder = getResponseBuilder(request);
+
+		// Read identityNumber from context
 		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
-		String identityNumber = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
-
-		ResponseBuilder builder;
-
+		String identityNumber = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$	
+		
 		try {
 			Optional<Appointment> appointmentOpt = appointmentService.findNextAppointment(identityNumber);
 
 			if (appointmentOpt.isPresent()) {
 				Appointment appointment = appointmentOpt.get();
-				builder = getResponseBuilder(request);
-				builder.add(AgentResponses.getString("Responses.NEXT_APPOINTMENT_1") //$NON-NLS-1$
-						+ renderDateTime(appointment.getDateTime())
-						+ AgentResponses.getString("Responses.NEXT_APPOINTMENT_2") + appointment.getClinic().getName());
+
+				builder.add(renderNextAppointment(appointment));
 
 			} else {
-
-				builder = getResponseBuilder(request);
 				builder.add(AgentResponses.getString("Responses.NO_APPOINTMENT")); //$NON-NLS-1$
 			}
 		} catch (UserNotFoundException e) {
-			builder = getResponseBuilder(request);
 			builder.add(AgentResponses.getString("Responses.NO_USER")); //$NON-NLS-1$
 		}
 
@@ -97,7 +95,7 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 	@ForIntent("appointment.request")
 	public ActionResponse requestAppointmentIntent(ActionRequest request) {
 
-		// Read context parameter
+		// Read identityNumber from context
 		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
 		String identityNumber = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
 
@@ -107,18 +105,27 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 			Optional<Appointment> appointmentOpt = appointmentService.findNextAppointment(identityNumber);
 
 			if (!appointmentOpt.isPresent()) {
-				// List<LocalTime> availableDays =
-				// retrieveDays(appointmentService.findAvailableSlots());
-				builder.add(AgentResponses.getString("Responses.AVAILABLE_DAY_SLOTS_1") + renderDates() //$NON-NLS-1$
+
+				List<LocalDate> availableDays = appointmentService.findAvailableDaySlots(identityNumber);
+				builder.add(AgentResponses.getString("Responses.AVAILABLE_DAY_SLOTS_1") + renderDates(availableDays) //$NON-NLS-1$
 						+ AgentResponses.getString("Responses.AVAILABLE_DAY_SLOTS_2"));
 
-			} else {
+				ActionContext creatingAppointmentContext = new ActionContext(CONTEXT_APPOINTMENT_CREATING, 10); // $NON-NLS-1$
 
-				builder = getResponseBuilder(request);
-				builder.add(AgentResponses.getString("Responses.ALREADY_APPOINTMENT")); //$NON-NLS-1$
+				// Read appointment type from request
+				AppointmentType appointmentType = (AppointmentType) readEnumParameter(
+						request.getParameter("appointmentType"), AppointmentType.class);
+
+				// Write appointment type into context
+				putParameter(creatingAppointmentContext, "appointmentType", appointmentType);
+
+				builder.add(creatingAppointmentContext);
+
+			} else {
+				builder.add(AgentResponses.getString("Responses.ALREADY_APPOINTMENT") //$NON-NLS-1$
+						+ renderNextAppointment(appointmentOpt.get()));
 			}
 		} catch (UserNotFoundException e) {
-			builder = getResponseBuilder(request);
 			builder.add(AgentResponses.getString("Responses.NO_USER")); //$NON-NLS-1$
 		}
 
@@ -137,7 +144,20 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 	public ActionResponse selectDayForRequestAppointmentFollowupIntent(ActionRequest request) {
 		ResponseBuilder builder = getResponseBuilder(request);
 
-		builder.add(AgentResponses.getString("Responses.AVAILABLE_DAY_SLOTS_1") + renderHours() //$NON-NLS-1$
+		// Read identityNumber from context
+		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
+		String identityNumber = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
+
+		// Read date from request
+		LocalDate date = readDateParameter(request.getParameter("date")); //$NON-NLS-1$
+		ActionContext creatingAppointmentContext = request.getContext(CONTEXT_APPOINTMENT_CREATING); // $NON-NLS-1$
+
+		// Write date into context
+		putParameter(creatingAppointmentContext, "date", date);
+
+		List<LocalTime> availableHours = appointmentService.findAvailableHourSlots(date, identityNumber);
+
+		builder.add(AgentResponses.getString("Responses.AVAILABLE_DAY_SLOTS_1") + renderHours(availableHours) //$NON-NLS-1$
 				+ AgentResponses.getString("Responses.AVAILABLE_DAY_SLOTS_2"));
 
 		ActionResponse actionResponse = builder.build();
@@ -155,14 +175,26 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 	public ActionResponse selectHourForRequestAppointmentFollowupIntent(ActionRequest request) {
 		ResponseBuilder builder = getResponseBuilder(request);
 
-		builder.add(AgentResponses.getString("Responses.APPOINTMENT_CONFIRMATION_1") + renderDateTime(LocalDateTime.now()) + AgentResponses.getString("Responses.APPOINTMENT_CONFIRMATION_2"));
+		// Read date from context
+		ActionContext creatingAppointmentContext = request.getContext(CONTEXT_APPOINTMENT_CREATING); // $NON-NLS-1$
+		LocalDate date = readDateParameter(creatingAppointmentContext.getParameters().get("date")); //$NON-NLS-1$
+
+		// Read time from request
+		LocalTime time = readTimeParameter(request.getParameter("time")); //$NON-NLS-1$
+
+		// Write time into context
+		putParameter(creatingAppointmentContext, "time", time);
+
+		LocalDateTime slotProposed = LocalDateTime.of(date, time);
+
+		builder.add(AgentResponses.getString("Responses.APPOINTMENT_CONFIRMATION_1") + renderDateTime(slotProposed)
+				+ AgentResponses.getString("Responses.APPOINTMENT_CONFIRMATION_2"));
 
 		ActionResponse actionResponse = builder.build();
 		return actionResponse;
 
 	}
 
-	
 	/**
 	 * Webhook for the followup intent when the user has to select the hour
 	 * 
@@ -173,61 +205,51 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 	public ActionResponse confirmForRequestAppointmentFollowupIntent(ActionRequest request) {
 		ResponseBuilder builder = getResponseBuilder(request);
 
-		builder.add(AgentResponses.getString("Responses.APPOINTMENT_CONFIRMATED") + renderDateTime(LocalDateTime.now()) );
+		// Read identityNumber from context
+		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
+		String identityNumber = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
+
+		// Read date and time from context
+		ActionContext creatingAppointmentContext = request.getContext(CONTEXT_APPOINTMENT_CREATING); // $NON-NLS-1$
+		LocalDate date = readDateParameter(creatingAppointmentContext.getParameters().get("date")); //$NON-NLS-1$
+		LocalTime time = readTimeParameter(creatingAppointmentContext.getParameters().get("time")); //$NON-NLS-1$
+		LocalDateTime slotProposed = LocalDateTime.of(date, time);
+
+		// Read appointment type from context
+		AppointmentType appointmentType = (AppointmentType) readEnumParameter(
+				creatingAppointmentContext.getParameters().get("appointmentType"), AppointmentType.class);
+
+		try {
+			Appointment appointment = appointmentService.confirmAppointment(identityNumber, slotProposed,
+					appointmentType, "No se indica");
+
+			builder.add(
+					AgentResponses.getString("Responses.APPOINTMENT_CONFIRMATED") + renderNextAppointment(appointment));
+
+		} catch (UserNotFoundException e) {
+			builder.add(AgentResponses.getString("Responses.NO_USER")); //$NON-NLS-1$
+
+		}
 
 		ActionResponse actionResponse = builder.build();
 		return actionResponse;
 
 	}
-	
-	
-	
-//	@ForIntent("appointment.request.yes")
-//	public ActionResponse confirmAppointmentIntent(ActionRequest request) {
-//
-//		// Read user id from the context
-//		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
-//		String identityNumber = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
-//
-//		// Read date time from the context
-//		context = request.getContext("slotproposed"); //$NON-NLS-1$
-//		LocalDateTime dateTime = readDateTime(context.getParameters().get("dateTime")); //$NON-NLS-1$
-//
-//		// Read appointmentType and subject from the request
-//		AppointmentType appointmentType = AppointmentType.valueOf((String) request.getParameter("appointmentType")); //$NON-NLS-1$
-//		String subject = (String) request.getParameter("subject"); //$NON-NLS-1$
-//
-//		ResponseBuilder builder = getResponseBuilder(request);
-//
-//		Appointment appointment;
-//		try {
-//
-//			appointment = appointmentService.confirmAppointment(identityNumber, dateTime, appointmentType, subject);
-//
-//			builder.add(AgentResponses.getString("Responses.APPOINTMENT_CONFIRMATION") //$NON-NLS-1$
-//					+ renderDateTime(appointment.getDateTime()));
-//			builder.removeContext("slotproposed"); //$NON-NLS-1$
-//
-//		} catch (UserNotFoundException e) {
-//			builder.add(AgentResponses.getString("Responses.NO_USER")); //$NON-NLS-1$
-//		} catch (AppointmentNotAvailableException e) {
-//			builder.add(AgentResponses.getString("Responses.NO_SLOT")); //$NON-NLS-1$
-//		}
-//
-//		ActionResponse actionResponse = builder.build();
-//
-//		return actionResponse;
-//
-//	}
-//
-//	@ForIntent("appointment.request.no")
-//	public ActionResponse cancelAppointmentIntent(ActionRequest request) {
-//
-//		ResponseBuilder builder = getResponseBuilder(request);
-//		builder.removeContext("slotproposed"); //$NON-NLS-1$
-//		ActionResponse actionResponse = builder.build();
-//
-//		return actionResponse;
-//
-//	}
+
+	private String renderNextAppointment(Appointment appointment) {
+
+		String result = AgentResponses.getString("Responses.NEXT_APPOINTMENT")
+				+ renderDateTime(appointment.getDateTime());
+
+		if (appointment.getType().equals(AppointmentType.FACE_TO_FACE)) {
+			result += AgentResponses.getString("Responses.NEXT_APPOINTMENT_FACE_TO_FACE")
+					+ appointment.getClinic().getName();
+		} else {
+			result += AgentResponses.getString("Responses.NEXT_APPOINTMENT_PHONE");
+
+		}
+		return result;
+
+	}
+
 }

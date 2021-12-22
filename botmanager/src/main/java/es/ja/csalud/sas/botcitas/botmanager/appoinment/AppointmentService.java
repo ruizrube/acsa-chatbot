@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -62,7 +63,7 @@ public class AppointmentService {
 		if (user.isPresent()) {
 
 			List<Appointment> appointments = appointmentRepository.findByAssignedDoctorAndDateTimeBetween(
-					user.get().getDoctor(), dateTime.truncatedTo(ChronoUnit.HOURS),
+					user.get().getDoctor().get(), dateTime.truncatedTo(ChronoUnit.HOURS),
 					dateTime.plusHours(1).truncatedTo(ChronoUnit.HOURS));
 
 			if (appointments.size() == 0) {
@@ -71,10 +72,11 @@ public class AppointmentService {
 				appointment.setDateTime(dateTime);
 				appointment.setType(type);
 				appointment.setSubject(subject);
-				appointment.setAssignedDoctor(user.get().getDoctor());
+				appointment.setAssignedDoctor(user.get().getDoctor().get());
+				appointment.setClinic(user.get().getClinic().get());
 				return appointmentRepository.save(appointment);
 			} else {
-				throw new AppointmentNotAvailableException(user.get().getDoctor(), dateTime);
+				throw new AppointmentNotAvailableException(user.get().getDoctor().get(), dateTime);
 			}
 
 		} else {
@@ -93,11 +95,7 @@ public class AppointmentService {
 		return appointmentRepository.findAll();
 	}
 
-	public List<LocalDateTime> findAvailableSlots() {
-		return null;
-		// TODO Auto-generated method stub
-		
-	}
+	
 	
 	
 	public Appointment confirmAppointment(String userId, LocalDateTime dateTime, AppointmentType type)
@@ -123,6 +121,23 @@ public class AppointmentService {
 
 		return LocalDateTime.of(newDate, newTime);
 
+	}
+
+	public List<LocalDate> findAvailableDaySlots(String identityNumber) {
+		
+		List<LocalDate> result= new ArrayList<LocalDate>();
+		result.add(LocalDate.now().plusDays(1));
+		result.add(LocalDate.now().plusDays(2));
+		result.add(LocalDate.now().plusDays(3));
+		return result;
+	}
+
+	public List<LocalTime> findAvailableHourSlots(LocalDate date, String identityNumber) {
+		List<LocalTime> result= new ArrayList<LocalTime>();
+		result.add(LocalTime.now().plusMinutes(15));
+		result.add(LocalTime.now().plusMinutes(30));
+		result.add(LocalTime.now().plusMinutes(45));
+		return result;
 	}
 
 	

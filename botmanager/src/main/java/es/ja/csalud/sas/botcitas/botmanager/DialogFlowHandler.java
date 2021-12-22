@@ -5,8 +5,13 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.StringJoiner;
 
+import com.google.actions.api.ActionContext;
 import com.google.actions.api.DialogflowApp;
 import com.google.actions.api.response.ResponseBuilder;
 import com.google.api.services.dialogflow_fulfillment.v2.model.EventInput;
@@ -27,7 +32,13 @@ public class DialogFlowHandler extends DialogflowApp {
 
 	protected static final String CONTEXT_USER_CONSENT = "user-consent";
 
-	protected DateTimeFormatter isoDateFormatter = DateTimeFormatter.ISO_DATE_TIME;
+	protected static final String CONTEXT_APPOINTMENT_CREATING = "appointment-creating";
+
+	protected DateTimeFormatter isoDateTimeFormatter = DateTimeFormatter.ISO_DATE_TIME;
+
+	protected DateTimeFormatter isoDateFormatter = DateTimeFormatter.ISO_DATE;
+
+	private DateTimeFormatter isoTimeFormatter = DateTimeFormatter.ISO_TIME;
 
 	/**
 	 * Method to return in the response body the event name to be triggered in
@@ -45,18 +56,27 @@ public class DialogFlowHandler extends DialogflowApp {
 
 	}
 
-	protected String renderDates() {
-		// TODO Auto-generated method stub
-		return "el lunes 1 por la mañana, 2 por la mañana, 3 por la tarde";
+	protected String renderDates(List<LocalDate> dates) {
+		StringJoiner result = new StringJoiner(", ");
+
+		for (LocalDate date : dates) {
+			result.add(renderDate(date));
+		}
+		return result.toString();
+
 	}
 
-	protected String renderHours() {
-		// TODO Auto-generated method stub
-		return "el lunes 1 a las 08:00, 08:10, 08:20, más tarde u otra fecha, ¿cuál prefieres?";
+	protected String renderHours(List<LocalTime> timeSlots) {
+		StringJoiner result = new StringJoiner(", ");
+
+		for (LocalTime time : timeSlots) {
+			result.add(renderTime(time));
+		}
+		return result.toString();
 	}
 
 	protected String renderDate(LocalDate date) {
-		return "el" + date.getDayOfMonth() + " de " //$NON-NLS-1$
+		return "el " + date.getDayOfMonth() + " de " //$NON-NLS-1$
 				+ date.getMonth().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es"));
 	}
 
@@ -69,8 +89,18 @@ public class DialogFlowHandler extends DialogflowApp {
 		return renderDate(dateTime.toLocalDate()) + renderTime(dateTime.toLocalTime());
 	}
 
-	protected LocalDateTime readDateTime(Object parameter) {
-		String value = ""; //$NON-NLS-1$
+	protected LocalDate readDateParameter(Object parameter) {
+
+		return LocalDate.parse(readStringParameter(parameter), isoDateTimeFormatter);
+	}
+
+	protected LocalTime readTimeParameter(Object parameter) {
+
+		return LocalTime.parse(readStringParameter(parameter), isoDateTimeFormatter);
+	}
+
+	protected String readStringParameter(Object parameter) {
+		String value = "";
 		if (parameter instanceof LinkedTreeMap) {
 			LinkedTreeMap map = (LinkedTreeMap) parameter;
 			value = (String) map.values().stream().findFirst().get();
@@ -78,6 +108,30 @@ public class DialogFlowHandler extends DialogflowApp {
 			value = (String) parameter;
 		}
 
-		return LocalDateTime.parse(value, isoDateFormatter);
+		return value;
+	}
+
+	
+
+	/**
+	 * TO DO: improve this method
+	 * @param parameter
+	 * @param classType
+	 * @return
+	 */
+	protected Enum readEnumParameter(Object parameter, Class classType) {
+		return Enum.valueOf(classType, parameter.toString());
+		
+	}
+	protected void putParameter(ActionContext context, String parameterName, Object object) {
+		Map<String, Object> params = context.getParameters();
+
+		if (params == null) {
+			params = new HashMap<String, Object>();
+		}
+		params.put(parameterName, object);
+		context.setParameters(params);
+
+
 	}
 }

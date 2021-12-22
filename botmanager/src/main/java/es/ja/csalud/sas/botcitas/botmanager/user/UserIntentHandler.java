@@ -137,6 +137,10 @@ public class UserIntentHandler extends DialogFlowHandler {
 			theUser.setAcceptConditions(true);
 			userService.save(theUser);
 			builder.add(AgentResponses.getString("Responses.USER_ACCEPTED_CONDITIONS")); //$NON-NLS-1$
+			
+			ActionContext userConsentContext = new ActionContext(CONTEXT_USER_CONSENT, 10); // $NON-NLS-1$
+			builder.add(userConsentContext);
+
 		} else {
 			builder.add(AgentResponses.getString("Responses.NO_USER")); //$NON-NLS-1$
 		}
@@ -168,6 +172,11 @@ public class UserIntentHandler extends DialogFlowHandler {
 			theUser.setEnabled(true);
 			userService.save(theUser);
 			builder.add(AgentResponses.getString("Responses.USER_ACTIVATED")); //$NON-NLS-1$
+			
+			// Set output context and its parameters
+			ActionContext userActivatedContext = new ActionContext(CONTEXT_USER_ACTIVATED, 10); // $NON-NLS-1$
+			builder.add(userActivatedContext);
+
 		} else {
 			builder.add(AgentResponses.getString("Responses.NO_USER")); //$NON-NLS-1$
 		}

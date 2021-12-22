@@ -75,14 +75,22 @@ public class User {
 		this.lastName = lastName;
 	}
 
-	public User getDoctor() {
-		return doctor;
+	public Optional<User> getDoctor() {
+		return Optional.ofNullable(doctor);
 	}
 
 	public void setDoctor(User doctor) {
 		this.doctor = doctor;
 	}
 
+	public Optional<Clinic> getClinic() {
+		return Optional.ofNullable(clinic);
+	}
+
+	public void setClinic(Optional<Clinic> clinic) {
+		this.clinic = clinic.get();
+	}
+	
 	public boolean isEnabled() {
 		return enabled;
 	}
@@ -99,12 +107,6 @@ public class User {
 		this.acceptConditions = acceptConditions;
 	}
 
-	public Optional<Clinic> getClinic() {
-		return Optional.ofNullable(clinic);
-	}
-
-	public void setClinic(Optional<Clinic> clinic) {
-		this.clinic = clinic.get();
-	}
+	
 
 }
