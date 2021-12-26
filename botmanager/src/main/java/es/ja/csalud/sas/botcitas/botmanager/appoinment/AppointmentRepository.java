@@ -12,8 +12,10 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
 
 	List<Appointment> findByUserAndDateTimeLessThan(Optional<User> user, LocalDateTime dateTime);
 
-	 List<Appointment> findByUserAndDateTimeGreaterThanEqualOrderByDateTimeAsc(Optional<User> user, LocalDateTime dateTime);
-
+	
 	List<Appointment> findByAssignedDoctorAndDateTimeBetween(User doctor, LocalDateTime minusMinutes, LocalDateTime plusMinutes);
+
+	List<Appointment> findByUserAndDateTimeGreaterThanEqualAndStatusOrderByDateTimeAsc(Optional<User> user,
+			LocalDateTime now, AppointmentStatus status);
 
 }

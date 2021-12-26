@@ -40,8 +40,8 @@ public class AppointmentService {
 		Optional<User> user = userRepository.findByIdentityDocument(userIdentityDocument);
 		if (user.isPresent()) {
 
-			List<Appointment> data = appointmentRepository.findByUserAndDateTimeGreaterThanEqualOrderByDateTimeAsc(user,
-					LocalDateTime.now());
+			List<Appointment> data = appointmentRepository.findByUserAndDateTimeGreaterThanEqualAndStatusOrderByDateTimeAsc(user,
+					LocalDateTime.now(),AppointmentStatus.CREATED);
 			if (data.size() > 0) {
 				return Optional.of(data.get(0));
 			} else {
@@ -56,10 +56,10 @@ public class AppointmentService {
 	
 	
 	
-	public Appointment confirmAppointment(String userId, LocalDateTime dateTime, AppointmentType type, String subject)
+	public Appointment confirmAppointment(String userIdentityDocument, LocalDateTime dateTime, AppointmentType type, String subject)
 			throws UserNotFoundException {
 
-		Optional<User> user = userRepository.findByIdentityDocument(userId);
+		Optional<User> user = userRepository.findByIdentityDocument(userIdentityDocument);
 		if (user.isPresent()) {
 
 			List<Appointment> appointments = appointmentRepository.findByAssignedDoctorAndDateTimeBetween(
@@ -71,6 +71,7 @@ public class AppointmentService {
 				appointment.setUser(user.get());
 				appointment.setDateTime(dateTime);
 				appointment.setType(type);
+				appointment.setStatus(AppointmentStatus.CREATED);
 				appointment.setSubject(subject);
 				appointment.setAssignedDoctor(user.get().getDoctor().get());
 				appointment.setClinic(user.get().getClinic().get());
@@ -80,11 +81,35 @@ public class AppointmentService {
 			}
 
 		} else {
-			throw new UserNotFoundException(userId);
+			throw new UserNotFoundException(userIdentityDocument);
 		}
 
 	}
 
+	
+	public boolean cancelAppointment(String userIdentityDocument)
+			throws UserNotFoundException {
+
+		Optional<User> user = userRepository.findByIdentityDocument(userIdentityDocument);
+		if (user.isPresent()) {
+
+			List<Appointment> data = appointmentRepository.findByUserAndDateTimeGreaterThanEqualAndStatusOrderByDateTimeAsc(user,
+					LocalDateTime.now(),AppointmentStatus.CREATED);
+			if (data.size() > 0) {
+				Appointment theAppointment=data.get(data.size()-1);
+				theAppointment.setStatus(AppointmentStatus.CANCELED);
+				appointmentRepository.save(theAppointment);
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			throw new UserNotFoundException(userIdentityDocument);
+		}
+
+	}
+	
+	
 	
 	public Appointment findById(String id) {
 		return appointmentRepository.findById(id).orElseThrow(() -> new AppointmentNotFoundException(id));

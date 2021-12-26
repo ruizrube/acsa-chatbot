@@ -56,7 +56,7 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 				builder.add(renderNextAppointment(appointment));
 
 			} else {
-				builder.add(AgentResponses.getString("Responses.NO_APPOINTMENT")); //$NON-NLS-1$
+				builder.add(AgentResponses.getString("Responses.NO_APPOINTMENT") + AgentResponses.getString("Responses.APPOINTMENT_REQUEST")); //$NON-NLS-1$
 			}
 		} catch (UserNotFoundException e) {
 			builder.add(AgentResponses.getString("Responses.NO_USER")); //$NON-NLS-1$
@@ -236,6 +236,74 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 
 	}
 
+	
+	/**
+	 * Webhook for canceling the user's next appointment 
+	 * 
+	 * @param request
+	 * @return
+	 */
+	@ForIntent("appointment.cancel")
+	public ActionResponse cancelAppointmentIntent(ActionRequest request) {
+
+		ResponseBuilder builder = getResponseBuilder(request);
+
+		// Read identityNumber from context
+		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
+		String identityNumber = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$	
+		
+		try {
+			Optional<Appointment> appointmentOpt = appointmentService.findNextAppointment(identityNumber);
+
+			if (appointmentOpt.isPresent()) {
+				Appointment appointment = appointmentOpt.get();
+
+				builder.add(renderNextAppointment(appointment) + AgentResponses.getString("Responses.APPOINTMENT_CANCELATION"));
+
+			} else {
+				builder.add(AgentResponses.getString("Responses.NO_APPOINTMENT")); //$NON-NLS-1$
+			}
+		} catch (UserNotFoundException e) {
+			builder.add(AgentResponses.getString("Responses.NO_USER")); //$NON-NLS-1$
+		}
+
+		ActionResponse actionResponse = builder.build();
+		return actionResponse;
+	}
+	
+	
+	
+	/**
+	 * Webhook for the followup intent when the user has decided to cancel the next appointment
+	 * 
+	 * @param request
+	 * @return
+	 */
+	@ForIntent("appointment.cancel - yes")
+	public ActionResponse cancelAppointmentFollowupIntent(ActionRequest request) {
+
+		ResponseBuilder builder = getResponseBuilder(request);
+
+		// Read identityNumber from context
+		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
+		String identityNumber = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$	
+		
+		try {
+			if(appointmentService.cancelAppointment(identityNumber)) {
+				builder.add(AgentResponses.getString("Responses.APPOINTMENT_CANCELED"));				
+			} else {
+				builder.add(AgentResponses.getString("Responses.APPOINTMENT_NO_CANCELED"));				
+			}						
+			
+		} catch (UserNotFoundException e) {
+			builder.add(AgentResponses.getString("Responses.NO_USER")); //$NON-NLS-1$
+		}
+
+		ActionResponse actionResponse = builder.build();
+		return actionResponse;
+	}
+	
+	
 	private String renderNextAppointment(Appointment appointment) {
 
 		String result = AgentResponses.getString("Responses.NEXT_APPOINTMENT")

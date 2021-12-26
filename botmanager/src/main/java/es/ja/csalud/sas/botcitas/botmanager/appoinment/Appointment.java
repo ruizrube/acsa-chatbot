@@ -41,6 +41,9 @@ public class Appointment {
 	@Enumerated(value = EnumType.STRING)
 	private AppointmentType type;
 
+	@Enumerated(value = EnumType.STRING)
+	private AppointmentStatus status;
+
 	public LocalDateTime getDateTime() {
 		return dateTime;
 	}
@@ -97,6 +100,12 @@ public class Appointment {
 		this.clinic = clinic;
 	}
 
+	public AppointmentStatus getStatus() {
+		return status;
+	}
 
+	public void setStatus(AppointmentStatus status) {
+		this.status = status;
+	}
 
 }
