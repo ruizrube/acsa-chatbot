@@ -26,8 +26,6 @@ import es.ja.csalud.sas.botcitas.botmanager.DialogFlowHandler;
 @Component
 public class UserIntentHandler extends DialogFlowHandler {
 
-
-
 	@Autowired
 	private UserService userService;
 
@@ -137,7 +135,7 @@ public class UserIntentHandler extends DialogFlowHandler {
 			theUser.setAcceptConditions(true);
 			userService.save(theUser);
 			builder.add(AgentResponses.getString("Responses.USER_ACCEPTED_CONDITIONS")); //$NON-NLS-1$
-			
+
 			ActionContext userConsentContext = new ActionContext(CONTEXT_USER_CONSENT, 10); // $NON-NLS-1$
 			builder.add(userConsentContext);
 
@@ -172,7 +170,7 @@ public class UserIntentHandler extends DialogFlowHandler {
 			theUser.setEnabled(true);
 			userService.save(theUser);
 			builder.add(AgentResponses.getString("Responses.USER_ACTIVATED")); //$NON-NLS-1$
-			
+
 			// Set output context and its parameters
 			ActionContext userActivatedContext = new ActionContext(CONTEXT_USER_ACTIVATED, 10); // $NON-NLS-1$
 			builder.add(userActivatedContext);
@@ -186,5 +184,36 @@ public class UserIntentHandler extends DialogFlowHandler {
 		return actionResponse;
 
 	}
-	
+
+	/**
+	 * Webhook for the followup intent when the user responds yes to revoke the
+	 * usage conditions
+	 * 
+	 * @param request
+	 * @return
+	 */
+	@ForIntent("user.revoke - yes")
+	public ActionResponse revokeUsageConditionsFollowupIntent(ActionRequest request) {
+		ResponseBuilder builder = getResponseBuilder(request);
+
+		// Read context parameter
+		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
+		String identityDocument = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
+
+		Optional<User> user = userService.findById(identityDocument);
+		if (user.isPresent()) {
+			User theUser = user.get();
+			theUser.setAcceptConditions(false);
+			userService.save(theUser);
+			builder.add(AgentResponses.getString("Responses.USER_REVOKE_CONDITIONS")); //$NON-NLS-1$
+			builder.removeContext(CONTEXT_USER_CONSENT);
+		} else {
+			builder.add(AgentResponses.getString("Responses.NO_USER")); //$NON-NLS-1$
+		}
+
+		ActionResponse actionResponse = builder.build();
+
+		return actionResponse;
+
+	}
 }
