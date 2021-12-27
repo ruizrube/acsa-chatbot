@@ -20,6 +20,8 @@ import com.google.actions.api.response.ResponseBuilder;
 
 import es.ja.csalud.sas.botcitas.botmanager.AgentResponses;
 import es.ja.csalud.sas.botcitas.botmanager.DialogFlowHandler;
+import es.ja.csalud.sas.botcitas.botmanager.user.UserNotAssignedToClinicException;
+import es.ja.csalud.sas.botcitas.botmanager.user.UserNotAssignedToDoctorException;
 import es.ja.csalud.sas.botcitas.botmanager.user.UserNotFoundException;
 
 /**
@@ -127,7 +129,11 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 			}
 		} catch (UserNotFoundException e) {
 			builder.add(AgentResponses.getString("Responses.NO_USER")); //$NON-NLS-1$
-		}
+		} catch (UserNotAssignedToDoctorException e) {
+			builder.add(AgentResponses.getString("Responses.USER_NO_ASSIGNED_TO_DOCTOR")); //$NON-NLS-1$
+		} catch (UserNotAssignedToClinicException e) {
+			builder.add(AgentResponses.getString("Responses.USER_NO_ASSIGNED_TO_CLINIC")); //$NON-NLS-1$
+		} 
 
 		ActionResponse actionResponse = builder.build();
 		return actionResponse;

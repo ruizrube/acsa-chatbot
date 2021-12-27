@@ -59,7 +59,7 @@ public class ClinicIntentHandler extends DialogFlowHandler {
 				builder.add(result); // $NON-NLS-1$
 
 			} else {
-				builder.add(AgentResponses.getString("Responses.USER_HAS_NOT_CLINIC")); //$NON-NLS-1$
+				builder.add(AgentResponses.getString("Responses.USER_NO_ASSIGNED_TO_CLINIC")); //$NON-NLS-1$
 
 			}
 
