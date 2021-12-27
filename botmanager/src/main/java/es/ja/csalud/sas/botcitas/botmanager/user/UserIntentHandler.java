@@ -35,7 +35,7 @@ public class UserIntentHandler extends DialogFlowHandler {
 	 * @param request
 	 * @return
 	 */
-	@ForIntent("user.signin")
+	@ForIntent("user.identify")
 	public ActionResponse signInUserFollowupIntent(ActionRequest request) {
 		ResponseBuilder builder = getResponseBuilder(request);
 
@@ -63,11 +63,15 @@ public class UserIntentHandler extends DialogFlowHandler {
 			if (theUser.isEnabled()) {
 				ActionContext userActivatedContext = new ActionContext(CONTEXT_USER_ACTIVATED, 10); // $NON-NLS-1$
 				builder.add(userActivatedContext);
-			}
 
-			// Write response
-			builder.add(AgentResponses.getString("Responses.GREETING_1") + user.get().getName() //$NON-NLS-1$
-					+ AgentResponses.getString("Responses.GREETING_2")); //$NON-NLS-1$
+				// Write response
+				builder.add(AgentResponses.getString("Responses.GREETING_1") + theUser.getName() //$NON-NLS-1$
+						+ AgentResponses.getString("Responses.GREETING_2")); //$NON-NLS-1$
+			} else {
+				// Write response
+				builder.add(AgentResponses.getString("Responses.GREETING_1")
+						+ AgentResponses.getString("Responses.GREETING_2")); //$NON-NLS-1$
+			}
 
 		} else {
 			builder.add(AgentResponses.getString("Responses.USER_NOT_FOUND")); //$NON-NLS-1$
@@ -195,8 +199,7 @@ public class UserIntentHandler extends DialogFlowHandler {
 	@ForIntent("fallback.missingcontexts")
 	public ActionResponse fallbackMissingContextsIntent(ActionRequest request) {
 		ResponseBuilder builder = getResponseBuilder(request);
-		
-		
+
 		ActionContext userIdentifiedContext = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
 
 		if (userIdentifiedContext != null) {
@@ -237,8 +240,7 @@ public class UserIntentHandler extends DialogFlowHandler {
 	 */
 	@ForIntent("fallback.missingcontexts - yes")
 	public ActionResponse fallbackMissingContextsFollowupIntent(ActionRequest request) {
-		
-				
+
 		ResponseBuilder builder = getResponseBuilder(request);
 
 		ActionContext userIdentifiedContext = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
