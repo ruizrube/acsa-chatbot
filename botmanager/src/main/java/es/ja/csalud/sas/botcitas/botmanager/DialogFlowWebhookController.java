@@ -33,10 +33,10 @@ public class DialogFlowWebhookController {
 	String serveAction(@RequestBody String body, @RequestHeader Map<String, String> headers) {
 
 		try {
-			return appointmentIntentHandler.handleRequest(body, headers).get();
+			return userIntentHandler.handleRequest(body, headers).get();
 		} catch (InterruptedException | ExecutionException e) {
 			try {
-				return userIntentHandler.handleRequest(body, headers).get();
+				return appointmentIntentHandler.handleRequest(body, headers).get();
 			} catch (InterruptedException | ExecutionException e1) {
 				try {
 					return clinicIntentHandler.handleRequest(body, headers).get();

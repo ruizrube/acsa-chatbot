@@ -20,6 +20,8 @@ import com.google.gson.internal.LinkedTreeMap;
 
 public class DialogFlowHandler extends DialogflowApp {
 
+	protected static final String EVENT_SIGN_IN = "SIGN_IN";
+	
 	protected static final String EVENT_CONSENT = "CONSENT";
 
 	protected static final String EVENT_ACTIVATE = "ACTIVATE";

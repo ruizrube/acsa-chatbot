@@ -30,13 +30,13 @@ public class UserIntentHandler extends DialogFlowHandler {
 	private UserService userService;
 
 	/**
-	 * Webhook for the intention of identify the user
+	 * Webhook for the followup intent when the user tries to sign in
 	 * 
 	 * @param request
 	 * @return
 	 */
-	@ForIntent("user.identify")
-	public ActionResponse identificateUserIntent(ActionRequest request) {
+	@ForIntent("user.signin")
+	public ActionResponse signInUserFollowupIntent(ActionRequest request) {
 		ResponseBuilder builder = getResponseBuilder(request);
 
 		// Read request parameter
@@ -44,6 +44,8 @@ public class UserIntentHandler extends DialogFlowHandler {
 
 		Optional<User> user = userService.findById(identityDocument);
 		if (user.isPresent()) {
+
+			User theUser = user.get();
 
 			ActionContext userIdentifiedContext = new ActionContext(CONTEXT_USER_IDENTIFIED, 10); // $NON-NLS-1$
 			Map<String, String> params = new HashMap<String, String>();
@@ -53,59 +55,23 @@ public class UserIntentHandler extends DialogFlowHandler {
 
 			builder.add(userIdentifiedContext);
 
-			if (user.get().isEnabled()) {
-
-				// Set output context and its parameters
-				ActionContext userActivatedContext = new ActionContext(CONTEXT_USER_ACTIVATED, 10); // $NON-NLS-1$
-				builder.add(userActivatedContext);
-
-				if (user.get().isAcceptConditions()) {
-					// Write response
-					builder.add(AgentResponses.getString("Responses.GREETING_1") + user.get().getName() //$NON-NLS-1$
-							+ AgentResponses.getString("Responses.GREETING_2")); //$NON-NLS-1$
-
-					ActionContext userConsentContext = new ActionContext(CONTEXT_USER_CONSENT, 10); // $NON-NLS-1$
-					builder.add(userConsentContext);
-
-				} else {
-					builder.add(AgentResponses.getString("Responses.USER_NOT_ACCEPTED_CONDITIONS")); //$NON-NLS-1$
-
-				}
-
-			} else {
-				builder.add(AgentResponses.getString("Responses.USER_NOT_ENABLED")); //$NON-NLS-1$
+			if (theUser.isAcceptConditions()) {
+				ActionContext userConsentContext = new ActionContext(CONTEXT_USER_CONSENT, 10); // $NON-NLS-1$
+				builder.add(userConsentContext);
 			}
 
+			if (theUser.isEnabled()) {
+				ActionContext userActivatedContext = new ActionContext(CONTEXT_USER_ACTIVATED, 10); // $NON-NLS-1$
+				builder.add(userActivatedContext);
+			}
+
+			// Write response
+			builder.add(AgentResponses.getString("Responses.GREETING_1") + user.get().getName() //$NON-NLS-1$
+					+ AgentResponses.getString("Responses.GREETING_2")); //$NON-NLS-1$
+
 		} else {
-
-			builder.add(AgentResponses.getString("USER_NOT_FOUNDNO_USER")); //$NON-NLS-1$
-			builder.setExpectUserResponse$actions_on_google(false);
-		}
-
-		ActionResponse actionResponse = builder.build();
-		return actionResponse;
-	}
-
-	/**
-	 * Webhook for the followup intent when the user responds yes to the oportunity
-	 * to activate him/herself or accept the usage conditions
-	 * 
-	 * @param request
-	 * @return
-	 */
-	@ForIntent("user.identify - yes")
-	public ActionResponse identificateUserFollowupIntent(ActionRequest request) {
-		ResponseBuilder builder = getResponseBuilder(request);
-
-		// Read context parameter
-
-		ActionContext userActivatedContext = request.getContext(CONTEXT_USER_ACTIVATED); // $NON-NLS-1$
-		if (userActivatedContext != null) { // Si el usuario está activo entonces lo que quiere es aceptar las
-											// condiciones de uso
-			triggerCustomEvent(builder, EVENT_CONSENT);
-
-		} else { // Si no está activo, entonces lo que quiere es activarlo
-			triggerCustomEvent(builder, EVENT_ACTIVATE);
+			builder.add(AgentResponses.getString("Responses.USER_NOT_FOUND")); //$NON-NLS-1$
+			// builder.setExpectUserResponse$actions_on_google(false);
 		}
 
 		ActionResponse actionResponse = builder.build();
@@ -134,10 +100,12 @@ public class UserIntentHandler extends DialogFlowHandler {
 			User theUser = user.get();
 			theUser.setAcceptConditions(true);
 			userService.save(theUser);
-			builder.add(AgentResponses.getString("Responses.USER_ACCEPTED_CONDITIONS")); //$NON-NLS-1$
 
+			// Set output context and its parameters
 			ActionContext userConsentContext = new ActionContext(CONTEXT_USER_CONSENT, 10); // $NON-NLS-1$
 			builder.add(userConsentContext);
+
+			builder.add(AgentResponses.getString("Responses.USER_ACCEPTED_CONDITIONS")); //$NON-NLS-1$
 
 		} else {
 			builder.add(AgentResponses.getString("Responses.USER_NOT_FOUND")); //$NON-NLS-1$
@@ -169,11 +137,12 @@ public class UserIntentHandler extends DialogFlowHandler {
 			User theUser = user.get();
 			theUser.setEnabled(true);
 			userService.save(theUser);
-			builder.add(AgentResponses.getString("Responses.USER_ACTIVATED")); //$NON-NLS-1$
 
 			// Set output context and its parameters
 			ActionContext userActivatedContext = new ActionContext(CONTEXT_USER_ACTIVATED, 10); // $NON-NLS-1$
 			builder.add(userActivatedContext);
+
+			builder.add(AgentResponses.getString("Responses.USER_ACTIVATED")); //$NON-NLS-1$
 
 		} else {
 			builder.add(AgentResponses.getString("Responses.USER_NOT_FOUND")); //$NON-NLS-1$
@@ -209,6 +178,90 @@ public class UserIntentHandler extends DialogFlowHandler {
 			builder.removeContext(CONTEXT_USER_CONSENT);
 		} else {
 			builder.add(AgentResponses.getString("Responses.USER_NOT_FOUND")); //$NON-NLS-1$
+		}
+
+		ActionResponse actionResponse = builder.build();
+
+		return actionResponse;
+
+	}
+
+	/**
+	 * Webhook for the fallback intent with no input contexts
+	 * 
+	 * @param request
+	 * @return
+	 */
+	@ForIntent("fallback.missingcontexts")
+	public ActionResponse fallbackMissingContextsIntent(ActionRequest request) {
+		ResponseBuilder builder = getResponseBuilder(request);
+		
+		
+		ActionContext userIdentifiedContext = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
+
+		if (userIdentifiedContext != null) {
+
+			ActionContext userConsentContext = request.getContext(CONTEXT_USER_CONSENT); // $NON-NLS-1$
+			if (userConsentContext != null) {
+
+				ActionContext userActivatedContext = request.getContext(CONTEXT_USER_ACTIVATED); // $NON-NLS-1$
+				if (userActivatedContext != null) {
+					builder.add(AgentResponses.getString("Responses.NON_UNDERSTANDABLE")); //$NON-NLS-1$
+				} else {
+					builder.add(AgentResponses.getString("Responses.USER_NOT_ENABLED")); //$NON-NLS-1$
+					builder.setExpectUserResponse$actions_on_google(true);
+				}
+
+			} else {
+				builder.add(AgentResponses.getString("Responses.USER_NOT_ACCEPTED_CONDITIONS")); //$NON-NLS-1$
+				builder.setExpectUserResponse$actions_on_google(true);
+
+			}
+		} else {
+			builder.add(AgentResponses.getString("Responses.USER_NOT_IDENTIFIED")); //$NON-NLS-1$
+			builder.setExpectUserResponse$actions_on_google(true);
+
+		}
+
+		ActionResponse actionResponse = builder.build();
+		return actionResponse;
+
+	}
+
+	/**
+	 * Webhook for the followup intent when the user responds yes to the oportunity
+	 * to sign in, accept usage condicionts or activate
+	 * 
+	 * @param request
+	 * @return
+	 */
+	@ForIntent("fallback.missingcontexts - yes")
+	public ActionResponse fallbackMissingContextsFollowupIntent(ActionRequest request) {
+		
+				
+		ResponseBuilder builder = getResponseBuilder(request);
+
+		ActionContext userIdentifiedContext = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
+
+		if (userIdentifiedContext != null) {
+
+			ActionContext userConsentContext = request.getContext(CONTEXT_USER_CONSENT); // $NON-NLS-1$
+			if (userConsentContext != null) {
+
+				ActionContext userActivatedContext = request.getContext(CONTEXT_USER_ACTIVATED); // $NON-NLS-1$
+				if (userActivatedContext == null) {
+
+					triggerCustomEvent(builder, EVENT_ACTIVATE);
+
+				}
+
+			} else {
+				triggerCustomEvent(builder, EVENT_CONSENT);
+			}
+		} else {
+
+			triggerCustomEvent(builder, EVENT_SIGN_IN);
+
 		}
 
 		ActionResponse actionResponse = builder.build();
