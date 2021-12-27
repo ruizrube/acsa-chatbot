@@ -78,7 +78,7 @@ public class UserIntentHandler extends DialogFlowHandler {
 
 		} else {
 
-			builder.add(AgentResponses.getString("Responses.NO_USER")); //$NON-NLS-1$
+			builder.add(AgentResponses.getString("USER_NOT_FOUNDNO_USER")); //$NON-NLS-1$
 			builder.setExpectUserResponse$actions_on_google(false);
 		}
 
@@ -140,7 +140,7 @@ public class UserIntentHandler extends DialogFlowHandler {
 			builder.add(userConsentContext);
 
 		} else {
-			builder.add(AgentResponses.getString("Responses.NO_USER")); //$NON-NLS-1$
+			builder.add(AgentResponses.getString("Responses.USER_NOT_FOUND")); //$NON-NLS-1$
 		}
 
 		ActionResponse actionResponse = builder.build();
@@ -176,7 +176,7 @@ public class UserIntentHandler extends DialogFlowHandler {
 			builder.add(userActivatedContext);
 
 		} else {
-			builder.add(AgentResponses.getString("Responses.NO_USER")); //$NON-NLS-1$
+			builder.add(AgentResponses.getString("Responses.USER_NOT_FOUND")); //$NON-NLS-1$
 		}
 
 		ActionResponse actionResponse = builder.build();
@@ -208,7 +208,7 @@ public class UserIntentHandler extends DialogFlowHandler {
 			builder.add(AgentResponses.getString("Responses.USER_REVOKE_CONDITIONS")); //$NON-NLS-1$
 			builder.removeContext(CONTEXT_USER_CONSENT);
 		} else {
-			builder.add(AgentResponses.getString("Responses.NO_USER")); //$NON-NLS-1$
+			builder.add(AgentResponses.getString("Responses.USER_NOT_FOUND")); //$NON-NLS-1$
 		}
 
 		ActionResponse actionResponse = builder.build();

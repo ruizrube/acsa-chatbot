@@ -58,10 +58,10 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 				builder.add(renderNextAppointment(appointment));
 
 			} else {
-				builder.add(AgentResponses.getString("Responses.NO_APPOINTMENT") + AgentResponses.getString("Responses.APPOINTMENT_REQUEST")); //$NON-NLS-1$
+				builder.add(AgentResponses.getString("Responses.APPOINTMENT_NO") + AgentResponses.getString("Responses.APPOINTMENT_REQUEST")); //$NON-NLS-1$
 			}
 		} catch (UserNotFoundException e) {
-			builder.add(AgentResponses.getString("Responses.NO_USER")); //$NON-NLS-1$
+			builder.add(AgentResponses.getString("Responses.USER_NOT_FOUND")); //$NON-NLS-1$
 		}
 
 		ActionResponse actionResponse = builder.build();
@@ -128,7 +128,7 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 						+ renderNextAppointment(appointmentOpt.get()));
 			}
 		} catch (UserNotFoundException e) {
-			builder.add(AgentResponses.getString("Responses.NO_USER")); //$NON-NLS-1$
+			builder.add(AgentResponses.getString("Responses.USER_NOT_FOUND")); //$NON-NLS-1$
 		} catch (UserNotAssignedToDoctorException e) {
 			builder.add(AgentResponses.getString("Responses.USER_NO_ASSIGNED_TO_DOCTOR")); //$NON-NLS-1$
 		} catch (UserNotAssignedToClinicException e) {
@@ -233,7 +233,7 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 					AgentResponses.getString("Responses.APPOINTMENT_CONFIRMATED") + renderNextAppointment(appointment));
 
 		} catch (UserNotFoundException e) {
-			builder.add(AgentResponses.getString("Responses.NO_USER")); //$NON-NLS-1$
+			builder.add(AgentResponses.getString("Responses.USER_NOT_FOUND")); //$NON-NLS-1$
 
 		}
 
@@ -267,10 +267,10 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 				builder.add(renderNextAppointment(appointment) + AgentResponses.getString("Responses.APPOINTMENT_CANCELATION"));
 
 			} else {
-				builder.add(AgentResponses.getString("Responses.NO_APPOINTMENT")); //$NON-NLS-1$
+				builder.add(AgentResponses.getString("Responses.APPOINTMENT_NO")); //$NON-NLS-1$
 			}
 		} catch (UserNotFoundException e) {
-			builder.add(AgentResponses.getString("Responses.NO_USER")); //$NON-NLS-1$
+			builder.add(AgentResponses.getString("Responses.USER_NOT_FOUND")); //$NON-NLS-1$
 		}
 
 		ActionResponse actionResponse = builder.build();
@@ -302,7 +302,7 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 			}						
 			
 		} catch (UserNotFoundException e) {
-			builder.add(AgentResponses.getString("Responses.NO_USER")); //$NON-NLS-1$
+			builder.add(AgentResponses.getString("Responses.USER_NOT_FOUND")); //$NON-NLS-1$
 		}
 
 		ActionResponse actionResponse = builder.build();
