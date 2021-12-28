@@ -103,12 +103,12 @@ public class DialogFlowHandler extends DialogflowApp {
 
 	protected LocalDate readDateParameter(Object parameter) {
 
-		return LocalDate.parse(readStringParameter(parameter), isoDateTimeFormatter);
+		return LocalDate.parse(readStringParameter(parameter), isoDateFormatter);
 	}
 
 	protected LocalTime readTimeParameter(Object parameter) {
 
-		return LocalTime.parse(readStringParameter(parameter), isoDateTimeFormatter);
+		return LocalTime.parse(readStringParameter(parameter), isoTimeFormatter);
 	}
 
 	protected String readStringParameter(Object parameter) {
@@ -142,6 +142,18 @@ public class DialogFlowHandler extends DialogflowApp {
 			params = new HashMap<String, Object>();
 		}
 		params.put(parameterName, object);
+		context.setParameters(params);
+	}
+	
+	protected void putDateParameter(ActionContext context, String parameterName, LocalDate object) {
+		Map<String, Object> params = context.getParameters();
+
+		if (params == null) {
+			params = new HashMap<String, Object>();
+		}
+		
+	
+		params.put(parameterName, object.format(isoDateFormatter));
 		context.setParameters(params);
 
 

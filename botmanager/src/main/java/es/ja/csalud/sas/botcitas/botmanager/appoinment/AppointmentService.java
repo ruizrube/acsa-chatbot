@@ -173,8 +173,10 @@ public class AppointmentService {
 
 	}
 
-	public List<LocalDate> findAvailableDaySlots(String userIdentityDocument) throws UserNotFoundException, UserNotAssignedToDoctorException, UserNotAssignedToClinicException {
+	public List<LocalDate> findAvailableDaySlots(String userIdentityDocument, AppointmentType appointmentType, LocalDate firstDate) throws UserNotFoundException, UserNotAssignedToDoctorException, UserNotAssignedToClinicException {
 
+		
+		// appointmentType is ignored
 		Optional<User> user = userRepository.findByIdentityDocument(userIdentityDocument);
 		if (user.isPresent()) {
 			if (!user.get().getDoctor().isPresent()) {
@@ -184,9 +186,9 @@ public class AppointmentService {
 				throw new UserNotAssignedToClinicException(userIdentityDocument);
 			}
 			List<LocalDate> result = new ArrayList<LocalDate>();
-			result.add(LocalDate.now().plusDays(1));
-			result.add(LocalDate.now().plusDays(2));
-			result.add(LocalDate.now().plusDays(3));
+			result.add(firstDate.plusDays(1));
+			result.add(firstDate.plusDays(2));
+			result.add(firstDate.plusDays(3));
 			return result;
 		} else {
 			throw new UserNotFoundException(userIdentityDocument);
