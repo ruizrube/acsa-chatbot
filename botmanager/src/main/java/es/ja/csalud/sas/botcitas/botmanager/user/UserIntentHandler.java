@@ -42,6 +42,9 @@ public class UserIntentHandler extends DialogFlowHandler {
 		// Read request parameter
 		String identityDocument = (String) request.getParameter("identityDocument"); //$NON-NLS-1$
 
+		removeAllContexts(builder);
+		
+		
 		Optional<User> user = userService.findById(identityDocument);
 		if (user.isPresent()) {
 
@@ -83,6 +86,8 @@ public class UserIntentHandler extends DialogFlowHandler {
 		return actionResponse;
 
 	}
+
+	
 
 	/**
 	 * Webhook for the followup intent when the user responds yes to accept the

@@ -42,6 +42,16 @@ public class DialogFlowHandler extends DialogflowApp {
 
 	private DateTimeFormatter isoTimeFormatter = DateTimeFormatter.ISO_TIME;
 
+	
+	protected void removeAllContexts(ResponseBuilder builder) {
+		builder.removeContext(CONTEXT_USER_IDENTIFIED);
+		builder.removeContext(CONTEXT_USER_CONSENT);
+		builder.removeContext(CONTEXT_USER_ACTIVATED);
+		builder.removeContext(CONTEXT_APPOINTMENT_CREATING);
+		
+	}
+	
+	
 	/**
 	 * Method to return in the response body the event name to be triggered in
 	 * Dialogflow
