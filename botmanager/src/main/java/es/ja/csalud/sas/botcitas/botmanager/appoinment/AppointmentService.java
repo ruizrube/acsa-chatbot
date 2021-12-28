@@ -30,6 +30,7 @@ public class AppointmentService {
 
 	/**
 	 * Obtain the user's past appointments
+	 * 
 	 * @param userIdentityDocument
 	 * @return
 	 * @throws UserNotFoundException
@@ -37,7 +38,8 @@ public class AppointmentService {
 	public List<Appointment> findPastAppointments(String userIdentityDocument) throws UserNotFoundException {
 		Optional<User> user = userRepository.findByIdentityDocument(userIdentityDocument);
 		if (user.isPresent()) {
-			return appointmentRepository.findByUserAndDateTimeLessThanAndStatusOrderByDateTimeAsc(user, LocalDateTime.now(),AppointmentStatus.CREATED);
+			return appointmentRepository.findByUserAndDateTimeLessThanAndStatusOrderByDateTimeAsc(user,
+					LocalDateTime.now(), AppointmentStatus.CREATED);
 		} else {
 			throw new UserNotFoundException(userIdentityDocument);
 		}
@@ -46,6 +48,7 @@ public class AppointmentService {
 
 	/**
 	 * Obtain the user's next appointment
+	 * 
 	 * @param userIdentityDocument
 	 * @return
 	 * @throws UserNotFoundException
@@ -70,6 +73,7 @@ public class AppointmentService {
 
 	/**
 	 * Register a new appointment for the user
+	 * 
 	 * @param userId
 	 * @param dateTime
 	 * @param type
@@ -115,6 +119,7 @@ public class AppointmentService {
 
 	/**
 	 * Cancel the user's next appointment
+	 * 
 	 * @param userIdentityDocument
 	 * @return
 	 * @throws UserNotFoundException
@@ -143,6 +148,7 @@ public class AppointmentService {
 
 	/**
 	 * Obtain a given appointment
+	 * 
 	 * @param id
 	 * @return
 	 */
@@ -153,13 +159,12 @@ public class AppointmentService {
 
 	/**
 	 * Obtain all the appointments stored
+	 * 
 	 * @return
 	 */
 	public List<Appointment> findAll() {
 		return appointmentRepository.findAll();
 	}
-
-	
 
 	public LocalDateTime findNextAvailableSlotAfterDate(AppointmentType type, LocalDateTime dateTime) {
 
@@ -173,9 +178,10 @@ public class AppointmentService {
 
 	}
 
-	public List<LocalDate> findAvailableDaySlots(String userIdentityDocument, AppointmentType appointmentType, LocalDate firstDate) throws UserNotFoundException, UserNotAssignedToDoctorException, UserNotAssignedToClinicException {
+	public List<LocalDate> findAvailableDaySlots(String userIdentityDocument, AppointmentType appointmentType,
+			LocalDate firstDate)
+			throws UserNotFoundException, UserNotAssignedToDoctorException, UserNotAssignedToClinicException {
 
-		
 		// appointmentType is ignored
 		Optional<User> user = userRepository.findByIdentityDocument(userIdentityDocument);
 		if (user.isPresent()) {
@@ -194,18 +200,31 @@ public class AppointmentService {
 			throw new UserNotFoundException(userIdentityDocument);
 		}
 
-		
 	}
 
-	public List<LocalTime> findAvailableHourSlots(LocalDate date, String identityNumber) {
-		List<LocalTime> result = new ArrayList<LocalTime>();
-		
-		LocalTime openingTime = LocalTime.of(8, 0);
-		
-		result.add(openingTime.plusMinutes(15));
-		result.add(openingTime.plusMinutes(30));
-		result.add(openingTime.plusMinutes(45));
-		return result;
+	public List<LocalTime> findAvailableHourSlots(String userIdentityDocument, AppointmentType appointmentType,
+			LocalDate date, LocalTime firstHour)
+			throws UserNotAssignedToClinicException, UserNotAssignedToDoctorException, UserNotFoundException {
+
+		// appointmentType is ignored
+		Optional<User> user = userRepository.findByIdentityDocument(userIdentityDocument);
+		if (user.isPresent()) {
+			if (!user.get().getDoctor().isPresent()) {
+				throw new UserNotAssignedToDoctorException(userIdentityDocument);
+			}
+			if (!user.get().getClinic().isPresent()) {
+				throw new UserNotAssignedToClinicException(userIdentityDocument);
+			}
+			List<LocalTime> result = new ArrayList<LocalTime>();
+
+			result.add(firstHour.plusMinutes(15));
+			result.add(firstHour.plusMinutes(30));
+			result.add(firstHour.plusMinutes(45));
+			return result;
+		} else {
+			throw new UserNotFoundException(userIdentityDocument);
+		}
+
 	}
 
 }

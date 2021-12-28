@@ -117,7 +117,7 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 						request.getParameter("appointmentType"), AppointmentType.class);
 
 				// Write appointment type into context
-				putParameter(creatingAppointmentContext, "appointmentType", appointmentType);
+				putObjectParameter(creatingAppointmentContext, "appointmentType", appointmentType);
 
 				// Write last date proposed into context
 				putDateParameter(creatingAppointmentContext, "lastDateProposed", LocalDate.now());
@@ -138,7 +138,6 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 
 	}
 
-	
 	/**
 	 * Webhook for the followup intent when the user rejected the days proposed
 	 * 
@@ -146,7 +145,7 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 	 * @return
 	 */
 	@ForIntent("appointment.request.otherday")
-	public ActionResponse rejectDayProposedForRequestAppointmentFollowupIntent(ActionRequest request) {
+	public ActionResponse rejectDaysProposedForRequestAppointmentFollowupIntent(ActionRequest request) {
 		ResponseBuilder builder = getResponseBuilder(request);
 
 		// Read identityNumber from context
@@ -160,9 +159,9 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 		ActionResponse actionResponse = builder.build();
 		return actionResponse;
 	}
-	
-	
-	private void proposeDatesToUser(String identityNumber, ResponseBuilder builder, ActionContext creatingAppointmentContext) {
+
+	private void proposeDatesToUser(String identityNumber, ResponseBuilder builder,
+			ActionContext creatingAppointmentContext) {
 
 		// Read lastDateProposed from context
 		LocalDate lastDateProposed = readDateParameter(
@@ -178,16 +177,14 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 			List<LocalDate> availableDays = appointmentService.findAvailableDaySlots(identityNumber, appointmentType,
 					lastDateProposed);
 
-			
 			if (availableDays.size() > 0) {
-			
+
 				// Write lastDateProposed into context
 				putDateParameter(creatingAppointmentContext, "lastDateProposed",
 						availableDays.get(availableDays.size() - 1));
 
 				builder.add(creatingAppointmentContext);
 
-				
 				builder.add(AgentResponses.getString("Responses.AVAILABLE_DAY_SLOTS_1") + renderDates(availableDays) //$NON-NLS-1$
 						+ AgentResponses.getString("Responses.AVAILABLE_DAY_SLOTS_2"));
 			} else {
@@ -202,8 +199,6 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 			builder.add(AgentResponses.getString("Responses.USER_NO_ASSIGNED_TO_CLINIC")); //$NON-NLS-1$
 		}
 	}
-
-	
 
 	/**
 	 * Webhook for the followup intent when the user has to select the day
@@ -222,20 +217,86 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 		// Read date from request
 		LocalDate date = readDateParameter(request.getParameter("date")); //$NON-NLS-1$
 
-		if (date != null) {
-			ActionContext creatingAppointmentContext = request.getContext(CONTEXT_APPOINTMENT_CREATING); // $NON-NLS-1$
+		// Write date into context
+		ActionContext creatingAppointmentContext = request.getContext(CONTEXT_APPOINTMENT_CREATING); // $NON-NLS-1$
+		putDateParameter(creatingAppointmentContext, "date", date);
 
-			// Write date into context
-			putParameter(creatingAppointmentContext, "date", date);
+		// Write last time proposed into context
+		putTimeParameter(creatingAppointmentContext, "lastTimeProposed", LocalTime.of(8, 0));
 
-			List<LocalTime> availableHours = appointmentService.findAvailableHourSlots(date, identityNumber);
-
-			builder.add(AgentResponses.getString("Responses.AVAILABLE_DAY_SLOTS_1") + renderHours(availableHours) //$NON-NLS-1$
-					+ AgentResponses.getString("Responses.AVAILABLE_DAY_SLOTS_2"));
-		}
+		proposeHoursToUser(identityNumber, builder, creatingAppointmentContext);
 		ActionResponse actionResponse = builder.build();
 		return actionResponse;
 
+	}
+
+	/**
+	 * Webhook for the followup intent when the user rejected the days proposed
+	 * 
+	 * @param request
+	 * @return
+	 */
+	@ForIntent("appointment.request.dayselection.otherhour")
+	public ActionResponse rejectHoursProposedForRequestAppointmentFollowupIntent(ActionRequest request) {
+		ResponseBuilder builder = getResponseBuilder(request);
+
+		// Read identityNumber from context
+		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
+		String identityNumber = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
+
+		ActionContext creatingAppointmentContext = request.getContext(CONTEXT_APPOINTMENT_CREATING); // $NON-NLS-1$
+
+		proposeHoursToUser(identityNumber, builder, creatingAppointmentContext);
+
+		ActionResponse actionResponse = builder.build();
+		return actionResponse;
+	}
+
+	private void proposeHoursToUser(String identityNumber, ResponseBuilder builder,
+			ActionContext creatingAppointmentContext) {
+		// Read date from request
+		LocalDate date = readDateParameter(creatingAppointmentContext.getParameters().get("date")); //$NON-NLS-1$
+
+		// Read lastTimeProposed from context
+		LocalTime lastTimeProposed = readTimeParameter(
+				creatingAppointmentContext.getParameters().get("lastTimeProposed")); //$NON-NLS-1$
+
+		// Read appointment type from context
+		AppointmentType appointmentType = (AppointmentType) readEnumParameter(
+				creatingAppointmentContext.getParameters().get("appointmentType"), AppointmentType.class);
+
+		if (date != null) {
+
+			List<LocalTime> availableHours;
+			try {
+
+				availableHours = appointmentService.findAvailableHourSlots(identityNumber, appointmentType, date,
+						lastTimeProposed);
+
+				if (availableHours.size() > 0) {
+					// Write lastTimeProposed into context
+					putTimeParameter(creatingAppointmentContext, "lastTimeProposed",
+							availableHours.get(availableHours.size() - 1));
+
+					builder.add(creatingAppointmentContext);
+
+					builder.add(
+							AgentResponses.getString("Responses.AVAILABLE_HOURS_SLOTS_1") + renderHours(availableHours) //$NON-NLS-1$
+									+ AgentResponses.getString("Responses.AVAILABLE_HOURS_SLOTS_2"));
+				} else {
+					builder.add(AgentResponses.getString("Responses.AVAILABLE_HOURS_NO"));
+					builder.removeContext(CONTEXT_APPOINTMENT_CREATING);
+				}
+
+			} catch (UserNotFoundException e) {
+				builder.add(AgentResponses.getString("Responses.USER_NOT_FOUND")); //$NON-NLS-1$
+			} catch (UserNotAssignedToDoctorException e) {
+				builder.add(AgentResponses.getString("Responses.USER_NO_ASSIGNED_TO_DOCTOR")); //$NON-NLS-1$
+			} catch (UserNotAssignedToClinicException e) {
+				builder.add(AgentResponses.getString("Responses.USER_NO_ASSIGNED_TO_CLINIC")); //$NON-NLS-1$
+			}
+
+		}
 	}
 
 	/**
@@ -256,7 +317,7 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 		LocalTime time = readTimeParameter(request.getParameter("time")); //$NON-NLS-1$
 
 		// Write time into context
-		putParameter(creatingAppointmentContext, "time", time);
+		putTimeParameter(creatingAppointmentContext, "time", time);
 
 		LocalDateTime slotProposed = LocalDateTime.of(date, time);
 

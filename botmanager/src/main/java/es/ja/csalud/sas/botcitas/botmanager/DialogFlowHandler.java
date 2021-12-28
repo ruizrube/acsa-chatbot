@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.format.TextStyle;
 import java.util.HashMap;
 import java.util.List;
@@ -18,10 +19,12 @@ import com.google.api.services.dialogflow_fulfillment.v2.model.EventInput;
 import com.google.api.services.dialogflow_fulfillment.v2.model.WebhookResponse;
 import com.google.gson.internal.LinkedTreeMap;
 
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentType;
+
 public class DialogFlowHandler extends DialogflowApp {
 
 	protected static final String EVENT_SIGN_IN = "SIGN_IN";
-	
+
 	protected static final String EVENT_CONSENT = "CONSENT";
 
 	protected static final String EVENT_ACTIVATE = "ACTIVATE";
@@ -42,16 +45,14 @@ public class DialogFlowHandler extends DialogflowApp {
 
 	private DateTimeFormatter isoTimeFormatter = DateTimeFormatter.ISO_TIME;
 
-	
 	protected void removeAllContexts(ResponseBuilder builder) {
 		builder.removeContext(CONTEXT_USER_IDENTIFIED);
 		builder.removeContext(CONTEXT_USER_CONSENT);
 		builder.removeContext(CONTEXT_USER_ACTIVATED);
 		builder.removeContext(CONTEXT_APPOINTMENT_CREATING);
-		
+
 	}
-	
-	
+
 	/**
 	 * Method to return in the response body the event name to be triggered in
 	 * Dialogflow
@@ -102,13 +103,30 @@ public class DialogFlowHandler extends DialogflowApp {
 	}
 
 	protected LocalDate readDateParameter(Object parameter) {
+		LocalDate result;
+		try {
+			result = LocalDate.parse(readStringParameter(parameter), isoDateFormatter);
 
-		return LocalDate.parse(readStringParameter(parameter), isoDateFormatter);
+		} catch (DateTimeParseException ex) {
+			result = LocalDate.parse(readStringParameter(parameter), isoDateTimeFormatter);
+
+		}
+
+		return result;
 	}
 
 	protected LocalTime readTimeParameter(Object parameter) {
 
-		return LocalTime.parse(readStringParameter(parameter), isoTimeFormatter);
+		LocalTime result;
+		try {
+			result = LocalTime.parse(readStringParameter(parameter), isoTimeFormatter);
+
+		} catch (DateTimeParseException ex) {
+			result = LocalTime.parse(readStringParameter(parameter), isoDateTimeFormatter);
+
+		}
+
+		return result;
 	}
 
 	protected String readStringParameter(Object parameter) {
@@ -123,19 +141,19 @@ public class DialogFlowHandler extends DialogflowApp {
 		return value;
 	}
 
-	
-
 	/**
 	 * TO DO: improve this method
+	 * 
 	 * @param parameter
 	 * @param classType
 	 * @return
 	 */
 	protected Enum readEnumParameter(Object parameter, Class classType) {
 		return Enum.valueOf(classType, parameter.toString());
-		
+
 	}
-	protected void putParameter(ActionContext context, String parameterName, Object object) {
+
+	protected void putObjectParameter(ActionContext context, String parameterName, Object object) {
 		Map<String, Object> params = context.getParameters();
 
 		if (params == null) {
@@ -144,18 +162,28 @@ public class DialogFlowHandler extends DialogflowApp {
 		params.put(parameterName, object);
 		context.setParameters(params);
 	}
-	
+
 	protected void putDateParameter(ActionContext context, String parameterName, LocalDate object) {
 		Map<String, Object> params = context.getParameters();
 
 		if (params == null) {
 			params = new HashMap<String, Object>();
 		}
-		
-	
+
 		params.put(parameterName, object.format(isoDateFormatter));
 		context.setParameters(params);
 
+	}
+
+	protected void putTimeParameter(ActionContext context, String parameterName, LocalTime object) {
+		Map<String, Object> params = context.getParameters();
+
+		if (params == null) {
+			params = new HashMap<String, Object>();
+		}
+
+		params.put(parameterName, object.format(isoTimeFormatter));
+		context.setParameters(params);
 
 	}
 }
