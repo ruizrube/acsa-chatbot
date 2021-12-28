@@ -28,16 +28,28 @@ public class AppointmentService {
 		this.appointmentRepository = appointmentRepository;
 	}
 
+	/**
+	 * Obtain the user's past appointments
+	 * @param userIdentityDocument
+	 * @return
+	 * @throws UserNotFoundException
+	 */
 	public List<Appointment> findPastAppointments(String userIdentityDocument) throws UserNotFoundException {
 		Optional<User> user = userRepository.findByIdentityDocument(userIdentityDocument);
 		if (user.isPresent()) {
-			return appointmentRepository.findByUserAndDateTimeLessThan(user, LocalDateTime.now());
+			return appointmentRepository.findByUserAndDateTimeLessThanAndStatusOrderByDateTimeAsc(user, LocalDateTime.now(),AppointmentStatus.CREATED);
 		} else {
 			throw new UserNotFoundException(userIdentityDocument);
 		}
 
 	}
 
+	/**
+	 * Obtain the user's next appointment
+	 * @param userIdentityDocument
+	 * @return
+	 * @throws UserNotFoundException
+	 */
 	public Optional<Appointment> findNextAppointment(String userIdentityDocument) throws UserNotFoundException {
 		Optional<User> user = userRepository.findByIdentityDocument(userIdentityDocument);
 		if (user.isPresent()) {
@@ -56,6 +68,14 @@ public class AppointmentService {
 		}
 	}
 
+	/**
+	 * Register a new appointment for the user
+	 * @param userId
+	 * @param dateTime
+	 * @param type
+	 * @return
+	 * @throws UserNotFoundException
+	 */
 	public Appointment confirmAppointment(String userId, LocalDateTime dateTime, AppointmentType type)
 			throws UserNotFoundException {
 
@@ -63,7 +83,7 @@ public class AppointmentService {
 
 	}
 
-	public Appointment confirmAppointment(String userIdentityDocument, LocalDateTime dateTime, AppointmentType type,
+	private Appointment confirmAppointment(String userIdentityDocument, LocalDateTime dateTime, AppointmentType type,
 			String subject) throws UserNotFoundException {
 
 		Optional<User> user = userRepository.findByIdentityDocument(userIdentityDocument);
@@ -93,6 +113,12 @@ public class AppointmentService {
 
 	}
 
+	/**
+	 * Cancel the user's next appointment
+	 * @param userIdentityDocument
+	 * @return
+	 * @throws UserNotFoundException
+	 */
 	public boolean cancelAppointment(String userIdentityDocument) throws UserNotFoundException {
 
 		Optional<User> user = userRepository.findByIdentityDocument(userIdentityDocument);
@@ -115,20 +141,25 @@ public class AppointmentService {
 
 	}
 
+	/**
+	 * Obtain a given appointment
+	 * @param id
+	 * @return
+	 */
 	public Appointment findById(String id) {
 		return appointmentRepository.findById(id).orElseThrow(() -> new AppointmentNotFoundException(id));
 
 	}
 
+	/**
+	 * Obtain all the appointments stored
+	 * @return
+	 */
 	public List<Appointment> findAll() {
 		return appointmentRepository.findAll();
 	}
 
-	public LocalDateTime findNextAvailableSlot(AppointmentType type) {
-
-		return findNextAvailableSlotAfterDate(type, LocalDateTime.now());
-
-	}
+	
 
 	public LocalDateTime findNextAvailableSlotAfterDate(AppointmentType type, LocalDateTime dateTime) {
 
@@ -166,9 +197,12 @@ public class AppointmentService {
 
 	public List<LocalTime> findAvailableHourSlots(LocalDate date, String identityNumber) {
 		List<LocalTime> result = new ArrayList<LocalTime>();
-		result.add(LocalTime.now().plusMinutes(15));
-		result.add(LocalTime.now().plusMinutes(30));
-		result.add(LocalTime.now().plusMinutes(45));
+		
+		LocalTime openingTime = LocalTime.of(8, 0);
+		
+		result.add(openingTime.plusMinutes(15));
+		result.add(openingTime.plusMinutes(30));
+		result.add(openingTime.plusMinutes(45));
 		return result;
 	}
 

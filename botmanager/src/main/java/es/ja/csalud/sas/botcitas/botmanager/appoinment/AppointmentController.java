@@ -33,10 +33,10 @@ class AppointmentController {
 
 	@PostMapping("/Appointments")
 	Appointment newAppointment(@RequestParam String userId, @RequestParam LocalDateTime dateTime,
-			@RequestParam AppointmentType type, @RequestParam String subject) {
+			@RequestParam AppointmentType type) {
 
 		try {
-			return service.confirmAppointment(userId, dateTime, type, subject);
+			return service.confirmAppointment(userId, dateTime, type);
 		} catch (UserNotFoundException e) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found");
 		}

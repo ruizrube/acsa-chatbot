@@ -227,7 +227,7 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 
 		try {
 			Appointment appointment = appointmentService.confirmAppointment(identityNumber, slotProposed,
-					appointmentType, "No se indica");
+					appointmentType);
 
 			builder.add(
 					AgentResponses.getString("Responses.APPOINTMENT_CONFIRMATED") + renderNextAppointment(appointment));
