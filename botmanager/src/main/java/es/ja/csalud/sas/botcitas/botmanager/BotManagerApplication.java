@@ -5,6 +5,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentService;
 import es.ja.csalud.sas.botcitas.botmanager.clinic.Clinic;
@@ -14,6 +15,8 @@ import es.ja.csalud.sas.botcitas.botmanager.user.UserService;
 
 @SpringBootApplication
 @EnableJpaRepositories
+@EnableTransactionManagement
+
 public class BotManagerApplication implements CommandLineRunner {
 
 	@Autowired

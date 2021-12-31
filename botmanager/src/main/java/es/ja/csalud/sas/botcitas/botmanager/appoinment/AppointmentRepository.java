@@ -12,7 +12,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
 
 	
 	
-	List<Appointment> findByAssignedDoctorAndDateTimeBetween(User doctor, LocalDateTime minusMinutes, LocalDateTime plusMinutes);
+	long countByAssignedDoctorAndDateTimeBetween(User doctor, LocalDateTime minusMinutes, LocalDateTime plusMinutes);
 
 	List<Appointment> findByUserAndDateTimeGreaterThanEqualAndStatusOrderByDateTimeAsc(Optional<User> user,
 			LocalDateTime now, AppointmentStatus status);

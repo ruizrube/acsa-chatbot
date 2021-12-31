@@ -148,7 +148,7 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 			String preTextResponse = "";
 			if (appointmentOpt.isPresent()) {
 				preTextResponse = AgentResponses.getString("Responses.ALREADY_APPOINTMENT") //$NON-NLS-1$
-						+ renderNextAppointment(appointmentOpt.get()) + ". ";
+						+ renderNextAppointment(appointmentOpt.get());
 
 			}
 
@@ -370,7 +370,7 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 			if (appointmentOpt.isPresent()) {
 				preTextResponse = AgentResponses.getString("Responses.ALREADY_APPOINTMENT_1") //$NON-NLS-1$
 						+ renderNextAppointment(appointmentOpt.get())
-						+ AgentResponses.getString("Responses.ALREADY_APPOINTMENT_2");
+						+ AgentResponses.getString("Responses.ALREADY_APPOINTMENT_2") + " ";
 			}
 
 			builder.add(preTextResponse + AgentResponses.getString("Responses.APPOINTMENT_CONFIRMATION_1")
@@ -411,10 +411,8 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 
 		try {
 
-			// Cancelamos cita previa que tuviese el usuario
-			appointmentService.cancelAppointment(identityNumber);
-
-			Appointment appointment = appointmentService.confirmAppointment(identityNumber, slotProposed,
+			
+			Appointment appointment = appointmentService.registerAppointment(identityNumber, slotProposed,
 					appointmentType);
 
 			builder.add(
@@ -423,6 +421,8 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 		} catch (UserNotFoundException e) {
 			builder.add(AgentResponses.getString("Responses.USER_NOT_FOUND")); //$NON-NLS-1$
 
+		} catch (AppointmentNotAvailableException e) {
+			builder.add(AgentResponses.getString("Responses.SLOT_NOT_AVAILABLE")); //$NON-NLS-1$
 		}
 
 		ActionResponse actionResponse = builder.build();

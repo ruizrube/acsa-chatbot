@@ -36,9 +36,11 @@ class AppointmentController {
 			@RequestParam AppointmentType type) {
 
 		try {
-			return service.confirmAppointment(userId, dateTime, type);
+			return service.registerAppointment(userId, dateTime, type);
 		} catch (UserNotFoundException e) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found");
+		} catch (AppointmentNotAvailableException e) {
+			throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, "Slot Not Available");
 		}
 
 	}

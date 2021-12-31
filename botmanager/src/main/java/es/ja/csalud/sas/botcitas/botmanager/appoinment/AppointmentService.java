@@ -1,5 +1,6 @@
 package es.ja.csalud.sas.botcitas.botmanager.appoinment;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -10,7 +11,10 @@ import java.util.Optional;
 import java.util.Random;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+import es.ja.csalud.sas.botcitas.botmanager.clinic.Clinic;
 import es.ja.csalud.sas.botcitas.botmanager.user.User;
 import es.ja.csalud.sas.botcitas.botmanager.user.UserNotAssignedToClinicException;
 import es.ja.csalud.sas.botcitas.botmanager.user.UserNotAssignedToDoctorException;
@@ -72,32 +76,33 @@ public class AppointmentService {
 	}
 
 	/**
-	 * Register a new appointment for the user
+	 * Register a new appointment for the user, canceling any previous appointment
 	 * 
 	 * @param userId
 	 * @param dateTime
 	 * @param type
 	 * @return
 	 * @throws UserNotFoundException
+	 * @throws AppointmentNotAvailableException
 	 */
-	public Appointment confirmAppointment(String userId, LocalDateTime dateTime, AppointmentType type)
-			throws UserNotFoundException {
+	@Transactional(rollbackFor = Exception.class)  
+	public Appointment registerAppointment(String userIdentityDocument, LocalDateTime dateTime, AppointmentType type)
+			throws UserNotFoundException, AppointmentNotAvailableException {
 
-		return confirmAppointment(userId, dateTime, type, "");
+		// Cancelamos cita previa que tuviese el usuario
+		cancelAppointment(userIdentityDocument);
+
+		return confirmAppointment(userIdentityDocument, dateTime, type, "");
 
 	}
 
 	private Appointment confirmAppointment(String userIdentityDocument, LocalDateTime dateTime, AppointmentType type,
-			String subject) throws UserNotFoundException {
+			String subject) throws UserNotFoundException, AppointmentNotAvailableException {
 
 		Optional<User> user = userRepository.findByIdentityDocument(userIdentityDocument);
 		if (user.isPresent()) {
 
-			List<Appointment> appointments = appointmentRepository.findByAssignedDoctorAndDateTimeBetween(
-					user.get().getDoctor().get(), dateTime.truncatedTo(ChronoUnit.HOURS),
-					dateTime.plusHours(1).truncatedTo(ChronoUnit.HOURS));
-
-			if (appointments.size() == 0) {
+			if (checkAvailability(user.get().getDoctor().get(), user.get().getClinic().get(), dateTime, type)) {
 				Appointment appointment = new Appointment();
 				appointment.setUser(user.get());
 				appointment.setDateTime(dateTime);
@@ -107,13 +112,36 @@ public class AppointmentService {
 				appointment.setAssignedDoctor(user.get().getDoctor().get());
 				appointment.setClinic(user.get().getClinic().get());
 				return appointmentRepository.save(appointment);
+
 			} else {
 				throw new AppointmentNotAvailableException(user.get().getDoctor().get(), dateTime);
+
 			}
 
 		} else {
 			throw new UserNotFoundException(userIdentityDocument);
 		}
+
+	}
+
+	private boolean checkAvailability(User doctor, Clinic clinic, LocalDateTime dateTime, AppointmentType type) {
+
+		if (dateTime.getDayOfWeek().equals(DayOfWeek.SATURDAY) || dateTime.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
+			return false;
+		}
+
+		if (dateTime.getHour() < 8 || dateTime.getHour() > 15) {
+			return false;
+		}
+
+		long countAppointments = appointmentRepository.countByAssignedDoctorAndDateTimeBetween(doctor,
+				dateTime.truncatedTo(ChronoUnit.MINUTES), dateTime.plusMinutes(15).truncatedTo(ChronoUnit.MINUTES));
+
+		if (countAppointments > 0) {
+			return false;
+		}
+
+		return true;
 
 	}
 
@@ -192,6 +220,7 @@ public class AppointmentService {
 				throw new UserNotAssignedToClinicException(userIdentityDocument);
 			}
 			List<LocalDate> result = new ArrayList<LocalDate>();
+			
 			result.add(firstDate.plusDays(1));
 			result.add(firstDate.plusDays(2));
 			result.add(firstDate.plusDays(3));
