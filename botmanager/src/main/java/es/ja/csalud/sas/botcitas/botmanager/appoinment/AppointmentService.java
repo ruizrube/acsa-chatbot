@@ -85,7 +85,7 @@ public class AppointmentService {
 	 * @throws UserNotFoundException
 	 * @throws AppointmentNotAvailableException
 	 */
-	@Transactional(rollbackFor = Exception.class)  
+	@Transactional(rollbackFor = Exception.class)
 	public Appointment registerAppointment(String userIdentityDocument, LocalDateTime dateTime, AppointmentType type)
 			throws UserNotFoundException, AppointmentNotAvailableException {
 
@@ -138,6 +138,16 @@ public class AppointmentService {
 				dateTime.truncatedTo(ChronoUnit.MINUTES), dateTime.plusMinutes(15).truncatedTo(ChronoUnit.MINUTES));
 
 		if (countAppointments > 0) {
+			return false;
+		}
+
+		return true;
+
+	}
+
+	private boolean checkAvailability(User doctor, Clinic clinic, LocalDate date, AppointmentType type) {
+
+		if (date.getDayOfWeek().equals(DayOfWeek.SATURDAY) || date.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
 			return false;
 		}
 
@@ -220,10 +230,17 @@ public class AppointmentService {
 				throw new UserNotAssignedToClinicException(userIdentityDocument);
 			}
 			List<LocalDate> result = new ArrayList<LocalDate>();
-			
-			result.add(firstDate.plusDays(1));
-			result.add(firstDate.plusDays(2));
-			result.add(firstDate.plusDays(3));
+
+			int days = 1;
+			while (result.size() < 3) {
+				LocalDate aux = firstDate.plusDays(days);
+				if (checkAvailability(user.get().getDoctor().get(), user.get().getClinic().get(), aux,
+						appointmentType)) {
+					result.add(aux);
+				}
+				days+=1;
+
+			}
 			return result;
 		} else {
 			throw new UserNotFoundException(userIdentityDocument);
@@ -246,9 +263,16 @@ public class AppointmentService {
 			}
 			List<LocalTime> result = new ArrayList<LocalTime>();
 
-			result.add(firstHour.plusMinutes(15));
-			result.add(firstHour.plusMinutes(30));
-			result.add(firstHour.plusMinutes(45));
+			int minutes = 15;
+			while (result.size() < 3) {
+				LocalDateTime aux = LocalDateTime.of(date, firstHour.plusMinutes(minutes));
+				if (checkAvailability(user.get().getDoctor().get(), user.get().getClinic().get(), aux,
+						appointmentType)) {
+					result.add(aux.toLocalTime());
+				}
+				minutes += 15;
+			}
+
 			return result;
 		} else {
 			throw new UserNotFoundException(userIdentityDocument);
