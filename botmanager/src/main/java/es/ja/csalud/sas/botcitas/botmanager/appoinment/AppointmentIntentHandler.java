@@ -90,6 +90,43 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 	}
 
 	/**
+	 * Webhook for modifying an appointment
+	 * 
+	 * @param request
+	 * @return
+	 */
+	@ForIntent("appointment.modify")
+	public ActionResponse modifyAppointmentIntent(ActionRequest request) {
+
+		// Read identityNumber from context
+		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
+		String identityNumber = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
+
+		ResponseBuilder builder = getResponseBuilder(request);
+
+		Optional<Appointment> appointmentOpt;
+		try {
+			appointmentOpt = appointmentService.findNextAppointment(identityNumber);
+
+			if (appointmentOpt.isPresent()) {
+
+				triggerCustomEvent(builder, EVENT_REQUEST_APPOINTMENT);
+
+			} else {
+				builder.add(AgentResponses.getString("Responses.APPOINTMENT_NO") //$NON-NLS-1$
+				);
+			}
+
+		} catch (UserNotFoundException e) {
+			builder.add(AgentResponses.getString("Responses.USER_NOT_FOUND")); //$NON-NLS-1$
+		}
+
+		ActionResponse actionResponse = builder.build();
+		return actionResponse;
+
+	}
+
+	/**
 	 * Webhook for requesting a new appointment
 	 * 
 	 * @param request
@@ -108,26 +145,26 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 		try {
 			appointmentOpt = appointmentService.findNextAppointment(identityNumber);
 
-			if (!appointmentOpt.isPresent()) {
+			String preTextResponse = "";
+			if (appointmentOpt.isPresent()) {
+				preTextResponse = AgentResponses.getString("Responses.ALREADY_APPOINTMENT") //$NON-NLS-1$
+						+ renderNextAppointment(appointmentOpt.get()) + ". ";
 
-				ActionContext creatingAppointmentContext = new ActionContext(CONTEXT_APPOINTMENT_CREATING, 10); // $NON-NLS-1$
-
-				// Read appointment type from request
-				AppointmentType appointmentType = (AppointmentType) readEnumParameter(
-						request.getParameter("appointmentType"), AppointmentType.class);
-
-				// Write appointment type into context
-				putObjectParameter(creatingAppointmentContext, "appointmentType", appointmentType);
-
-				// Write last date proposed into context
-				putDateParameter(creatingAppointmentContext, "lastDateProposed", LocalDate.now());
-
-				proposeDatesToUser(identityNumber, builder, creatingAppointmentContext);
-
-			} else {
-				builder.add(AgentResponses.getString("Responses.ALREADY_APPOINTMENT") //$NON-NLS-1$
-						+ renderNextAppointment(appointmentOpt.get()));
 			}
+
+			ActionContext creatingAppointmentContext = new ActionContext(CONTEXT_APPOINTMENT_CREATING, 10); // $NON-NLS-1$
+
+			// Read appointment type from request
+			AppointmentType appointmentType = (AppointmentType) readEnumParameter(
+					request.getParameter("appointmentType"), AppointmentType.class);
+
+			// Write appointment type into context
+			putObjectParameter(creatingAppointmentContext, "appointmentType", appointmentType);
+
+			// Write last date proposed into context
+			putDateParameter(creatingAppointmentContext, "lastDateProposed", LocalDate.now());
+
+			proposeDatesToUser(identityNumber, builder, creatingAppointmentContext, preTextResponse);
 
 		} catch (UserNotFoundException e) {
 			builder.add(AgentResponses.getString("Responses.USER_NOT_FOUND")); //$NON-NLS-1$
@@ -154,14 +191,14 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 
 		ActionContext creatingAppointmentContext = request.getContext(CONTEXT_APPOINTMENT_CREATING);
 
-		proposeDatesToUser(identityNumber, builder, creatingAppointmentContext);
+		proposeDatesToUser(identityNumber, builder, creatingAppointmentContext, "");
 
 		ActionResponse actionResponse = builder.build();
 		return actionResponse;
 	}
 
 	private void proposeDatesToUser(String identityNumber, ResponseBuilder builder,
-			ActionContext creatingAppointmentContext) {
+			ActionContext creatingAppointmentContext, String preTextResponse) {
 
 		// Read lastDateProposed from context
 		LocalDate lastDateProposed = readDateParameter(
@@ -185,10 +222,10 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 
 				builder.add(creatingAppointmentContext);
 
-				builder.add(AgentResponses.getString("Responses.AVAILABLE_DAY_SLOTS_1") + renderDates(availableDays) //$NON-NLS-1$
-						+ AgentResponses.getString("Responses.AVAILABLE_DAY_SLOTS_2"));
+				builder.add(preTextResponse + AgentResponses.getString("Responses.AVAILABLE_DAY_SLOTS_1") //$NON-NLS-1$
+						+ renderDates(availableDays) + AgentResponses.getString("Responses.AVAILABLE_DAY_SLOTS_2"));
 			} else {
-				builder.add(AgentResponses.getString("Responses.AVAILABLE_DAY_NO"));
+				builder.add(preTextResponse + AgentResponses.getString("Responses.AVAILABLE_DAY_NO"));
 				builder.removeContext(CONTEXT_APPOINTMENT_CREATING);
 			}
 		} catch (UserNotFoundException e) {
@@ -321,8 +358,27 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 
 		LocalDateTime slotProposed = LocalDateTime.of(date, time);
 
-		builder.add(AgentResponses.getString("Responses.APPOINTMENT_CONFIRMATION_1") + renderDateTime(slotProposed)
-				+ AgentResponses.getString("Responses.APPOINTMENT_CONFIRMATION_2"));
+		// Read identityNumber from context
+		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
+		String identityNumber = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
+
+		Optional<Appointment> appointmentOpt;
+		try {
+			appointmentOpt = appointmentService.findNextAppointment(identityNumber);
+
+			String preTextResponse = "";
+			if (appointmentOpt.isPresent()) {
+				preTextResponse = AgentResponses.getString("Responses.ALREADY_APPOINTMENT_1") //$NON-NLS-1$
+						+ renderNextAppointment(appointmentOpt.get())
+						+ AgentResponses.getString("Responses.ALREADY_APPOINTMENT_2");
+			}
+
+			builder.add(preTextResponse + AgentResponses.getString("Responses.APPOINTMENT_CONFIRMATION_1")
+					+ renderDateTime(slotProposed) + AgentResponses.getString("Responses.APPOINTMENT_CONFIRMATION_2"));
+
+		} catch (UserNotFoundException e) {
+			builder.add(AgentResponses.getString("Responses.USER_NOT_FOUND")); //$NON-NLS-1$
+		}
 
 		ActionResponse actionResponse = builder.build();
 		return actionResponse;
@@ -354,6 +410,10 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 				creatingAppointmentContext.getParameters().get("appointmentType"), AppointmentType.class);
 
 		try {
+
+			// Cancelamos cita previa que tuviese el usuario
+			appointmentService.cancelAppointment(identityNumber);
+
 			Appointment appointment = appointmentService.confirmAppointment(identityNumber, slotProposed,
 					appointmentType);
 

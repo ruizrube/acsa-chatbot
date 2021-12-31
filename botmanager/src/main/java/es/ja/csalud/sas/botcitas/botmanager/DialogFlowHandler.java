@@ -31,6 +31,8 @@ public class DialogFlowHandler extends DialogflowApp {
 
 	protected static final String EVENT_REQUEST_APPOINTMENT = "REQUEST_APPOINTMENT";
 
+	protected static final String EVENT_MODIFY_APPOINTMENT = "MODIFY_APPOINTMENT";
+
 	protected static final String CONTEXT_USER_IDENTIFIED = "user-identified";
 
 	protected static final String CONTEXT_USER_ACTIVATED = "user-activated";
