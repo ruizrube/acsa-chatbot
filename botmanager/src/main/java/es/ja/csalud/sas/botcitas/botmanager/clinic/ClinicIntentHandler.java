@@ -45,9 +45,9 @@ public class ClinicIntentHandler extends DialogFlowHandler {
 
 		// Read context parameter
 		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
-		String identityDocument = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
+		String userIdentifier = (String) context.getParameters().get("userIdentifier"); //$NON-NLS-1$
 
-		Optional<User> user = userService.findById(identityDocument);
+		Optional<User> user = userService.findByIdentifier(userIdentifier);
 		if (user.isPresent()) {
 			Optional<Clinic> clinic = user.get().getClinic();
 			if (clinic.isPresent()) {

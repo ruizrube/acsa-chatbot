@@ -47,10 +47,10 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 
 		// Read identityNumber from context
 		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
-		String identityNumber = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
+		String userIdentifier = (String) context.getParameters().get("userIdentifier"); //$NON-NLS-1$
 
 		try {
-			Optional<Appointment> appointmentOpt = appointmentService.findNextAppointment(identityNumber);
+			Optional<Appointment> appointmentOpt = appointmentService.findNextAppointment(userIdentifier);
 
 			if (appointmentOpt.isPresent()) {
 				Appointment appointment = appointmentOpt.get();
@@ -100,13 +100,13 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 
 		// Read identityNumber from context
 		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
-		String identityNumber = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
+		String userIdentifier = (String) context.getParameters().get("userIdentifier"); //$NON-NLS-1$
 
 		ResponseBuilder builder = getResponseBuilder(request);
 
 		Optional<Appointment> appointmentOpt;
 		try {
-			appointmentOpt = appointmentService.findNextAppointment(identityNumber);
+			appointmentOpt = appointmentService.findNextAppointment(userIdentifier);
 
 			if (appointmentOpt.isPresent()) {
 
@@ -137,13 +137,13 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 
 		// Read identityNumber from context
 		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
-		String identityNumber = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
+		String userIdentifier = (String) context.getParameters().get("userIdentifier"); //$NON-NLS-1$
 
 		ResponseBuilder builder = getResponseBuilder(request);
 
 		Optional<Appointment> appointmentOpt;
 		try {
-			appointmentOpt = appointmentService.findNextAppointment(identityNumber);
+			appointmentOpt = appointmentService.findNextAppointment(userIdentifier);
 
 			String preTextResponse = "";
 			if (appointmentOpt.isPresent()) {
@@ -164,7 +164,7 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 			// Write last date proposed into context
 			putDateParameter(creatingAppointmentContext, "lastDateProposed", LocalDate.now());
 
-			proposeDatesToUser(identityNumber, builder, creatingAppointmentContext, preTextResponse);
+			proposeDatesToUser(userIdentifier, builder, creatingAppointmentContext, preTextResponse);
 
 		} catch (UserNotFoundException e) {
 			builder.add(AgentResponses.getString("Responses.USER_NOT_FOUND")); //$NON-NLS-1$
@@ -187,17 +187,17 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 
 		// Read identityNumber from context
 		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
-		String identityNumber = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
+		String userIdentifier = (String) context.getParameters().get("userIdentifier"); //$NON-NLS-1$
 
 		ActionContext creatingAppointmentContext = request.getContext(CONTEXT_APPOINTMENT_CREATING);
 
-		proposeDatesToUser(identityNumber, builder, creatingAppointmentContext, "");
+		proposeDatesToUser(userIdentifier, builder, creatingAppointmentContext, "");
 
 		ActionResponse actionResponse = builder.build();
 		return actionResponse;
 	}
 
-	private void proposeDatesToUser(String identityNumber, ResponseBuilder builder,
+	private void proposeDatesToUser(String userIdentifier, ResponseBuilder builder,
 			ActionContext creatingAppointmentContext, String preTextResponse) {
 
 		// Read lastDateProposed from context
@@ -211,7 +211,7 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 		try {
 			// Obtain availability
 
-			List<LocalDate> availableDays = appointmentService.findAvailableDaySlots(identityNumber, appointmentType,
+			List<LocalDate> availableDays = appointmentService.findAvailableDaySlots(userIdentifier, appointmentType,
 					lastDateProposed);
 
 			if (availableDays.size() > 0) {
@@ -249,7 +249,7 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 
 		// Read identityNumber from context
 		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
-		String identityNumber = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
+		String userIdentifier = (String) context.getParameters().get("userIdentifier"); //$NON-NLS-1$
 
 		// Read date from request
 		LocalDate date = readDateParameter(request.getParameter("date")); //$NON-NLS-1$
@@ -261,7 +261,7 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 		// Write last time proposed into context
 		putTimeParameter(creatingAppointmentContext, "lastTimeProposed", LocalTime.of(8, 0));
 
-		proposeHoursToUser(identityNumber, builder, creatingAppointmentContext);
+		proposeHoursToUser(userIdentifier, builder, creatingAppointmentContext);
 		ActionResponse actionResponse = builder.build();
 		return actionResponse;
 
@@ -279,11 +279,11 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 
 		// Read identityNumber from context
 		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
-		String identityNumber = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
+		String userIdentifier = (String) context.getParameters().get("userIdentifier"); //$NON-NLS-1$
 
 		ActionContext creatingAppointmentContext = request.getContext(CONTEXT_APPOINTMENT_CREATING); // $NON-NLS-1$
 
-		proposeHoursToUser(identityNumber, builder, creatingAppointmentContext);
+		proposeHoursToUser(userIdentifier, builder, creatingAppointmentContext);
 
 		ActionResponse actionResponse = builder.build();
 		return actionResponse;
@@ -360,11 +360,11 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 
 		// Read identityNumber from context
 		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
-		String identityNumber = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
+		String userIdentifier = (String) context.getParameters().get("userIdentifier"); //$NON-NLS-1$
 
 		Optional<Appointment> appointmentOpt;
 		try {
-			appointmentOpt = appointmentService.findNextAppointment(identityNumber);
+			appointmentOpt = appointmentService.findNextAppointment(userIdentifier);
 
 			String preTextResponse = "";
 			if (appointmentOpt.isPresent()) {
@@ -397,7 +397,7 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 
 		// Read identityNumber from context
 		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
-		String identityNumber = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
+		String userIdentifier = (String) context.getParameters().get("userIdentifier"); //$NON-NLS-1$
 
 		// Read date and time from context
 		ActionContext creatingAppointmentContext = request.getContext(CONTEXT_APPOINTMENT_CREATING); // $NON-NLS-1$
@@ -412,7 +412,7 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 		try {
 
 			
-			Appointment appointment = appointmentService.registerAppointment(identityNumber, slotProposed,
+			Appointment appointment = appointmentService.registerAppointment(userIdentifier, slotProposed,
 					appointmentType);
 
 			builder.add(
@@ -443,10 +443,10 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 
 		// Read identityNumber from context
 		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
-		String identityNumber = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
+		String userIdentifier = (String) context.getParameters().get("userIdentifier"); //$NON-NLS-1$
 
 		try {
-			Optional<Appointment> appointmentOpt = appointmentService.findNextAppointment(identityNumber);
+			Optional<Appointment> appointmentOpt = appointmentService.findNextAppointment(userIdentifier);
 
 			if (appointmentOpt.isPresent()) {
 				Appointment appointment = appointmentOpt.get();
@@ -479,10 +479,10 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 
 		// Read identityNumber from context
 		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
-		String identityNumber = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
+		String userIdentifier = (String) context.getParameters().get("userIdentifier"); //$NON-NLS-1$
 
 		try {
-			if (appointmentService.cancelAppointment(identityNumber)) {
+			if (appointmentService.cancelAppointment(userIdentifier)) {
 				builder.add(AgentResponses.getString("Responses.APPOINTMENT_CANCELED"));
 			} else {
 				builder.add(AgentResponses.getString("Responses.APPOINTMENT_NO_CANCELED"));

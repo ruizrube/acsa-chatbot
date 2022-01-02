@@ -3,33 +3,26 @@ package es.ja.csalud.sas.botcitas.botmanager.user;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.stereotype.Service;
+public interface UserService {
 
-@Service
-public class UserService {
+	User save(User user);
 
-	private UserRepository userRepository;
-
-	public UserService(UserRepository userRepository) {
-		this.userRepository = userRepository;
-	}
-
-	public User save(User user) {
-		return this.userRepository.saveAndFlush(user);
-	}
-
-	public long count() {
-		
-		return userRepository.count();
-	}
-
-	public Optional<User> findById(String userIdentityDocument) {
-		return userRepository.findByIdentityDocument(userIdentityDocument);
-	}
-
-	public List<User> findAll() {
-		return userRepository.findAll();
-	}
+	long count();
 
 	
+	/**
+	 * Get a user by his/her identity national card or his/her NUHSA (Numero Unico Historia Salud Andalucia)
+	 * @param identifier
+	 * @return
+	 */
+	Optional<User> findByIdentifier(String identifier);
+	
+
+
+	/**
+	 * Get all users
+	 * @return
+	 */
+	List<User> findAll();
+
 }

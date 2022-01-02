@@ -8,4 +8,8 @@ public interface UserRepository extends JpaRepository<User, String>{
 
 	Optional<User> findByIdentityDocument(String userIdentityDocument);
 
+	Optional<User> findByNuhsa(String nuhsa);
+
+	Optional<User> findByIdentityDocumentOrNuhsa(String userIdentityDocument, String nuhsa);
+
 }

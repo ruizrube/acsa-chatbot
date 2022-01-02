@@ -26,9 +26,9 @@ class UserController {
 
 	// Single item
 	@GetMapping("/Users/{id}")
-	Optional<User> one(@PathVariable String id) {
+	Optional<User> one(@PathVariable String userIdentifier) {
 
-		return service.findById(id);
+		return service.findByIdentifier(userIdentifier);
 	}
 
 }

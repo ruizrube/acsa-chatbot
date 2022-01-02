@@ -3,34 +3,14 @@ package es.ja.csalud.sas.botcitas.botmanager.clinic;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.stereotype.Service;
+public interface ClinicService {
 
-@Service
-public class ClinicService {
+	Clinic save(Clinic Clinic);
 
-	private ClinicRepository repository;
+	long count();
 
-	public ClinicService(ClinicRepository ClinicRepository) {
-		this.repository = ClinicRepository;
-	}
+	Optional<Clinic> findById(String id);
 
-	public Clinic save(Clinic Clinic) {
-		return this.repository.saveAndFlush(Clinic);
-	}
+	List<Clinic> findAll();
 
-	public long count() {
-		
-		return repository.count();
-	}
-
-	public Optional<Clinic> findById(String id) {
-		return repository.findById(id);
-	}
-
-	public List<Clinic> findAll() {
-		return repository.findAll();
-	}
-
-
-	
 }

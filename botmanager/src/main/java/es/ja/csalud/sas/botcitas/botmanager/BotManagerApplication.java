@@ -54,12 +54,14 @@ public class BotManagerApplication implements CommandLineRunner {
 			doctor.setFirstName("Doctor");
 			doctor.setLastName("Facultativo");
 			doctor.setIdentityDocument("0101010");
+			doctor.setNuhsa("0000000000");
 			doctor = userService.save(doctor);
 
 			User user = new User();
 			user.setFirstName("Pepe");
 			user.setLastName("Andaluz");
 			user.setIdentityDocument("111");
+			user.setNuhsa("1111111111");			
 			user.setDoctor(doctor);
 			user = userService.save(user);
 
@@ -67,6 +69,7 @@ public class BotManagerApplication implements CommandLineRunner {
 			user.setFirstName("María");
 			user.setLastName("Andaluza");
 			user.setIdentityDocument("222");
+			user.setNuhsa("2222222222");			
 			user.setDoctor(doctor);
 			user = userService.save(user);
 			
@@ -74,6 +77,7 @@ public class BotManagerApplication implements CommandLineRunner {
 			user.setFirstName("Luis");
 			user.setLastName("Andaluz");
 			user.setIdentityDocument("333");
+			user.setNuhsa("3333333333");			
 			user.setDoctor(doctor);
 			user = userService.save(user);
 			
@@ -81,6 +85,7 @@ public class BotManagerApplication implements CommandLineRunner {
 			user.setFirstName("Carmen");
 			user.setLastName("Andaluza");
 			user.setIdentityDocument("444");
+			user.setNuhsa("4444444444");						
 			user.setDoctor(doctor);
 			user = userService.save(user);
 

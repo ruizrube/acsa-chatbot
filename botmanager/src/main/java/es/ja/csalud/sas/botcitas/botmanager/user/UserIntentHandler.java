@@ -40,19 +40,19 @@ public class UserIntentHandler extends DialogFlowHandler {
 		ResponseBuilder builder = getResponseBuilder(request);
 
 		// Read request parameter
-		String identityDocument = (String) request.getParameter("identityDocument"); //$NON-NLS-1$
+		String identifier = (String) request.getParameter("userIdentifier"); //$NON-NLS-1$
 
 		removeAllContexts(builder);
 		
 		
-		Optional<User> user = userService.findById(identityDocument);
+		Optional<User> user = userService.findByIdentifier(identifier);
 		if (user.isPresent()) {
 
 			User theUser = user.get();
 
 			ActionContext userIdentifiedContext = new ActionContext(CONTEXT_USER_IDENTIFIED, 10); // $NON-NLS-1$
 			Map<String, String> params = new HashMap<String, String>();
-			params.put("identityDocument", user.get().getIdentityDocument()); //$NON-NLS-1$
+			params.put("userIdentifier", identifier); //$NON-NLS-1$
 			params.put("userName", user.get().getFirstName()); //$NON-NLS-1$
 			userIdentifiedContext.setParameters(params);
 
@@ -102,9 +102,9 @@ public class UserIntentHandler extends DialogFlowHandler {
 
 		// Read context parameter
 		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
-		String identityDocument = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
+		String userIdentifier = (String) context.getParameters().get("userIdentifier"); //$NON-NLS-1$
 
-		Optional<User> user = userService.findById(identityDocument);
+		Optional<User> user = userService.findByIdentifier(userIdentifier);
 		if (user.isPresent()) {
 			User theUser = user.get();
 			theUser.setAcceptConditions(true);
@@ -139,9 +139,9 @@ public class UserIntentHandler extends DialogFlowHandler {
 
 		// Read context parameter
 		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
-		String identityDocument = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
+		String userIdentifier = (String) context.getParameters().get("userIdentifier"); //$NON-NLS-1$
 
-		Optional<User> user = userService.findById(identityDocument);
+		Optional<User> user = userService.findByIdentifier(userIdentifier);
 		if (user.isPresent()) {
 			User theUser = user.get();
 			theUser.setEnabled(true);
@@ -176,9 +176,9 @@ public class UserIntentHandler extends DialogFlowHandler {
 
 		// Read context parameter
 		ActionContext context = request.getContext(CONTEXT_USER_IDENTIFIED); // $NON-NLS-1$
-		String identityDocument = (String) context.getParameters().get("identityDocument"); //$NON-NLS-1$
+		String userIdentifier = (String) context.getParameters().get("userIdentifier"); //$NON-NLS-1$
 
-		Optional<User> user = userService.findById(identityDocument);
+		Optional<User> user = userService.findByIdentifier(userIdentifier);
 		if (user.isPresent()) {
 			User theUser = user.get();
 			theUser.setAcceptConditions(false);
