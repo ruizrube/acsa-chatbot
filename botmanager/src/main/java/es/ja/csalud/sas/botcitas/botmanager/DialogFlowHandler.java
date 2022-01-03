@@ -19,8 +19,6 @@ import com.google.api.services.dialogflow_fulfillment.v2.model.EventInput;
 import com.google.api.services.dialogflow_fulfillment.v2.model.WebhookResponse;
 import com.google.gson.internal.LinkedTreeMap;
 
-import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentType;
-
 public class DialogFlowHandler extends DialogflowApp {
 
 	protected static final String EVENT_SIGN_IN = "SIGN_IN";

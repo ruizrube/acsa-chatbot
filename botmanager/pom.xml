@@ -131,5 +131,15 @@
 			</properties>
 
 		</profile>
+		<profile>
+			<!-- Container mode is activated using -Pcontainer -->
+			<id>container</id>
+
+			<!-- IRR: Spring profile -->
+			<properties>
+				<spring.profiles.active>container</spring.profiles.active>
+			</properties>
+
+		</profile>
 	</profiles>
 </project>

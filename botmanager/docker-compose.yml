@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+
+  acsa-chatbot-mysql:
+    image:  mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=mysql
+      - MYSQL_DATABASE=appointments
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=mysql
+    ports:
+      - 3306:3306
+    networks:
+      - acsa-chatbot-network
+      
+  acsa-chatbot-botmanager:
+    image: botmanager
+    networks:
+      - acsa-chatbot-network
+    restart: on-failure
+    depends_on:
+      - acsa-chatbot-mysql
+    ports:
+      - 8080:8080
+  
+   
+networks:
+  acsa-chatbot-network: 
