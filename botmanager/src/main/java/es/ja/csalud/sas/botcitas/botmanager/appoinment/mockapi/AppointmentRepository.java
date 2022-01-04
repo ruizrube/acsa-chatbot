@@ -1,4 +1,4 @@
-package es.ja.csalud.sas.botcitas.botmanager.appoinment;
+package es.ja.csalud.sas.botcitas.botmanager.appoinment.mockapi;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -6,6 +6,8 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.Appointment;
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentStatus;
 import es.ja.csalud.sas.botcitas.botmanager.user.User;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, String>{

@@ -1,4 +1,4 @@
-package es.ja.csalud.sas.botcitas.botmanager.appoinment;
+package es.ja.csalud.sas.botcitas.botmanager.appoinment.mockapi;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.Appointment;
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentNotAvailableException;
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentService;
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentType;
 import es.ja.csalud.sas.botcitas.botmanager.user.UserNotFoundException;
 
 @RestController

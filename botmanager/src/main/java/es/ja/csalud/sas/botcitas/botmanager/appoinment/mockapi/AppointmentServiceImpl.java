@@ -1,4 +1,4 @@
-package es.ja.csalud.sas.botcitas.botmanager.appoinment;
+package es.ja.csalud.sas.botcitas.botmanager.appoinment.mockapi;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -12,6 +12,12 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.Appointment;
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentNotAvailableException;
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentNotFoundException;
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentService;
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentStatus;
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentType;
 import es.ja.csalud.sas.botcitas.botmanager.clinic.Clinic;
 import es.ja.csalud.sas.botcitas.botmanager.user.User;
 import es.ja.csalud.sas.botcitas.botmanager.user.UserNotAssignedToClinicException;

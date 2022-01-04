@@ -1,9 +1,12 @@
-package es.ja.csalud.sas.botcitas.botmanager.user;
+package es.ja.csalud.sas.botcitas.botmanager.user.mockapi;
 
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+
+import es.ja.csalud.sas.botcitas.botmanager.user.User;
+import es.ja.csalud.sas.botcitas.botmanager.user.UserService;
 
 @Service
 public class UserServiceImpl implements UserService {

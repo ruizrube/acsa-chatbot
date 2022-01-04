@@ -87,10 +87,10 @@ public class User {
 		return Optional.ofNullable(clinic);
 	}
 
-	public void setClinic(Optional<Clinic> clinic) {
-		this.clinic = clinic.get();
+	public void setClinic(Clinic clinic) {
+		this.clinic = clinic;
 	}
-	
+
 	public boolean isEnabled() {
 		return enabled;
 	}
@@ -106,7 +106,5 @@ public class User {
 	public void setAcceptConditions(boolean acceptConditions) {
 		this.acceptConditions = acceptConditions;
 	}
-
-	
 
 }

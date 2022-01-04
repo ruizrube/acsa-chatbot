@@ -1,9 +1,12 @@
-package es.ja.csalud.sas.botcitas.botmanager.clinic;
+package es.ja.csalud.sas.botcitas.botmanager.clinic.mockapi;
 
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+
+import es.ja.csalud.sas.botcitas.botmanager.clinic.Clinic;
+import es.ja.csalud.sas.botcitas.botmanager.clinic.ClinicService;
 
 @Service
 public class ClinicServiceImpl implements ClinicService {

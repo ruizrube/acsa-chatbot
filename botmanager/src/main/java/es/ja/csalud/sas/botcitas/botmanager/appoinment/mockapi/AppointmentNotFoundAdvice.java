@@ -1,10 +1,12 @@
-package es.ja.csalud.sas.botcitas.botmanager.appoinment;
+package es.ja.csalud.sas.botcitas.botmanager.appoinment.mockapi;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentNotFoundException;
 
 @ControllerAdvice
 class AppointmentNotFoundAdvice {
