@@ -1,0 +1,42 @@
+@startuml
+node "Desktop PC" as Desktop{
+   component "Web Browser" as Browser
+}
+
+node Mobile {
+   component "Google Assistant" as Assistant
+}
+
+node "Amazon EC2" as Server{
+ 
+  component "Spring Boot Application"{
+    component "acsa-chatbot.es webpage" as WebPage {
+      component "Dialogflow Messenger" as Messenger
+    }
+    component "Bot Manager" as BotManager
+    component "Citas Mock API" as CitasMock
+    interface "Citas API" as interace
+  }
+  database MySQL
+  }
+
+cloud "Google Cloud"{
+  component "Dialogflow API" as Dialogflow
+}
+
+
+cloud "Servicio Andaluz de Salud"{
+  component "Diraya Citación" as Diraya
+  interface "Citas API" as CitasAPI
+}
+
+CitasAPI - Diraya
+Browser -up-> WebPage
+Assistant -up-> Dialogflow
+Messenger --> Dialogflow
+Dialogflow -l-> BotManager
+BotManager-up-(CitasAPI
+BotManager-r-(interace
+interace-r-CitasMock
+CitasMock-u->MySQL
+@enduml
