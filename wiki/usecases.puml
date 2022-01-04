@@ -1,0 +1,51 @@
+@startuml
+!theme blueprint
+left to right direction
+
+package "Gestión de Usuarios" {
+  usecase "Identificar Usuario" as ucSignIn
+  usecase "Activar Usuario" as ucActivate
+  usecase "Aceptar Condiciones de Uso" as ucAccept
+  usecase "Revocar Condiciones de Uso" as ucRevoke
+}
+
+package "Gestión de Citas" {
+  usecase "Solicitar Cita" as usRequest
+  usecase "Modificar Cita" as usModify
+  usecase "Anular Cita" as usCancel
+  usecase "Consultar Próxima Cita" as usQuery
+}
+
+package "Commons" {
+  usecase "Saludar al Usuario" as ucGreet
+  usecase "Despedirse del Usuario" as ucBye
+  usecase "Recibir Ayuda" as ucHelp
+  usecase "Consultar Centro de Salud" as ucClinic
+}
+
+actor "Usuario anónimo" as aAnonymous
+actor "Usuario identificado" as aIdentified
+actor "Usuario autorizado" as aUser
+
+aAnonymous <|-- aIdentified
+
+aIdentified <|-- aUser
+
+
+
+aAnonymous --> ucSignIn
+aIdentified --> ucActivate
+aIdentified --> ucAccept
+aUser --> ucRevoke
+
+
+aUser --> usRequest
+aUser --> usModify
+aUser --> usCancel
+aUser --> usQuery
+
+aAnonymous --> ucGreet
+aAnonymous --> ucBye
+aAnonymous --> ucHelp
+aUser --> ucClinic
+@enduml
