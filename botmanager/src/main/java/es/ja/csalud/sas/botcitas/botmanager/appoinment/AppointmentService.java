@@ -60,7 +60,7 @@ public interface AppointmentService {
 	 * @param id
 	 * @return
 	 */
-	Appointment findById(String id);
+	Appointment findById(String id) throws AppointmentNotFoundException;
 
 	/**
 	 * Obtain all the appointments stored

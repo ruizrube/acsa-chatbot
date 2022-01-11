@@ -162,7 +162,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 	}
 
 	@Override
-	public Appointment findById(String id) {
+	public Appointment findById(String id) throws AppointmentNotFoundException {
 		return appointmentRepository.findById(id).orElseThrow(() -> new AppointmentNotFoundException(id));
 
 	}

@@ -14,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import es.ja.csalud.sas.botcitas.botmanager.appoinment.Appointment;
 import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentNotAvailableException;
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentNotFoundException;
 import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentService;
 import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentType;
 import es.ja.csalud.sas.botcitas.botmanager.user.UserNotFoundException;
@@ -53,7 +54,11 @@ class AppointmentController {
 	@GetMapping("/Appointments/{id}")
 	Appointment one(@PathVariable String id) {
 
-		return service.findById(id);
+		try {
+			return service.findById(id);
+		} catch (AppointmentNotFoundException e) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Appointment Not Found");
+		}
 	}
 
 	// Single item
