@@ -26,15 +26,15 @@ public class UserDataGenerator {
 				User doctor = new User();
 				doctor.setFirstName("Doctor");
 				doctor.setLastName("Facultativo");
-				doctor.setIdentityDocument("0101010");
-				doctor.setNuhsa("0000000000");
+				doctor.setIdentityDocument("99999999Z");
+				doctor.setNuhsa("9999999999");
 				doctor.setClinic(clinic);
 				doctor = userService.save(doctor);
 
 				User user = new User();
 				user.setFirstName("Pepe");
 				user.setLastName("Andaluz");
-				user.setIdentityDocument("111");
+				user.setIdentityDocument("11111111A");
 				user.setNuhsa("1111111111");
 				user.setDoctor(doctor);
 				user.setClinic(clinic);				
@@ -43,7 +43,7 @@ public class UserDataGenerator {
 				user = new User();
 				user.setFirstName("María");
 				user.setLastName("Andaluza");
-				user.setIdentityDocument("222");
+				user.setIdentityDocument("22222222B");
 				user.setNuhsa("2222222222");
 				user.setDoctor(doctor);
 				user.setClinic(clinic);								
@@ -52,7 +52,7 @@ public class UserDataGenerator {
 				user = new User();
 				user.setFirstName("Luis");
 				user.setLastName("Andaluz");
-				user.setIdentityDocument("333");
+				user.setIdentityDocument("33333333C");
 				user.setNuhsa("3333333333");
 				user.setDoctor(doctor);
 				user.setClinic(clinic);								
@@ -61,7 +61,7 @@ public class UserDataGenerator {
 				user = new User();
 				user.setFirstName("Carmen");
 				user.setLastName("Andaluza");
-				user.setIdentityDocument("444");
+				user.setIdentityDocument("44444444D");
 				user.setNuhsa("4444444444");
 				user.setDoctor(doctor);
 				user.setClinic(clinic);								
