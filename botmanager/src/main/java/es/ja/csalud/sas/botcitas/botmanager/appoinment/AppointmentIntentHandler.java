@@ -147,7 +147,7 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 
 			String preTextResponse = "";
 			if (appointmentOpt.isPresent()) {
-				preTextResponse = AgentResponses.getString("Responses.ALREADY_APPOINTMENT") //$NON-NLS-1$
+				preTextResponse = AgentResponses.getString("Responses.APPOINTMENT_ALREADY") //$NON-NLS-1$
 						+ renderNextAppointment(appointmentOpt.get());
 
 			}
@@ -368,9 +368,9 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 
 			String preTextResponse = "";
 			if (appointmentOpt.isPresent()) {
-				preTextResponse = AgentResponses.getString("Responses.ALREADY_APPOINTMENT_1") //$NON-NLS-1$
+				preTextResponse = AgentResponses.getString("Responses.APPOINTMENT_ALREADY_1") //$NON-NLS-1$
 						+ renderNextAppointment(appointmentOpt.get())
-						+ AgentResponses.getString("Responses.ALREADY_APPOINTMENT_2") + " ";
+						+ AgentResponses.getString("Responses.APPOINTMENT_ALREADY_2") + " ";
 			}
 
 			builder.add(preTextResponse + AgentResponses.getString("Responses.APPOINTMENT_CONFIRMATION_1")
@@ -422,7 +422,7 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 			builder.add(AgentResponses.getString("Responses.USER_NOT_FOUND")); //$NON-NLS-1$
 
 		} catch (AppointmentNotAvailableException e) {
-			builder.add(AgentResponses.getString("Responses.SLOT_NOT_AVAILABLE")); //$NON-NLS-1$
+			builder.add(AgentResponses.getString("Responses.AVAILABLE_NO_SLOT")); //$NON-NLS-1$
 		}
 
 		ActionResponse actionResponse = builder.build();
@@ -498,14 +498,14 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 
 	private String renderNextAppointment(Appointment appointment) {
 
-		String result = AgentResponses.getString("Responses.NEXT_APPOINTMENT")
+		String result = AgentResponses.getString("Responses.APPOINTMENT_NEXT")
 				+ renderDateTime(appointment.getDateTime());
 
 		if (appointment.getType().equals(AppointmentType.FACE_TO_FACE)) {
-			result += AgentResponses.getString("Responses.NEXT_APPOINTMENT_FACE_TO_FACE")
+			result += AgentResponses.getString("Responses.APPOINTMENT_NEXT_FACE_TO_FACE")
 					+ appointment.getClinic().getName();
 		} else {
-			result += AgentResponses.getString("Responses.NEXT_APPOINTMENT_PHONE");
+			result += AgentResponses.getString("Responses.APPOINTMENT_NEXT_PHONE");
 
 		}
 		return result;

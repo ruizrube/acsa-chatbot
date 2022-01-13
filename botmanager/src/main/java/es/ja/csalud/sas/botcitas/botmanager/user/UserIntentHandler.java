@@ -68,11 +68,11 @@ public class UserIntentHandler extends DialogFlowHandler {
 				builder.add(userActivatedContext);
 
 				// Write response
-				builder.add(AgentResponses.getString("Responses.GREETING_1") + theUser.getName() //$NON-NLS-1$
+				builder.add(AgentResponses.getString("Responses.GREETING_1") + theUser.getName() + ", " //$NON-NLS-1$
 						+ AgentResponses.getString("Responses.GREETING_2")); //$NON-NLS-1$
 			} else {
 				// Write response
-				builder.add(AgentResponses.getString("Responses.GREETING_1")
+				builder.add(AgentResponses.getString("Responses.GREETING_1")  // por seguridad no se revela el nombre del usuario
 						+ AgentResponses.getString("Responses.GREETING_2")); //$NON-NLS-1$
 			}
 

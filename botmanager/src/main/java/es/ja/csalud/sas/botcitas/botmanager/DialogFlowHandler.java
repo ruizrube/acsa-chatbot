@@ -89,7 +89,9 @@ public class DialogFlowHandler extends DialogflowApp {
 	}
 
 	protected String renderDate(LocalDate date) {
-		return "el " + date.getDayOfMonth() + " de " //$NON-NLS-1$
+		
+		
+		return "el " + date.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es")) + " " + date.getDayOfMonth() + " de " //$NON-NLS-1$
 				+ date.getMonth().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es"));
 	}
 
