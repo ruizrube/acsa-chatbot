@@ -20,6 +20,7 @@ public class UserDataGenerator {
 				Clinic clinic = new Clinic();
 				clinic.setCity("Cádiz");
 				clinic.setPhone("956956956");
+				clinic.setName("Loreto Puntales");
 				clinic.setAddress("Hidroavión Numancia, 0");
 				clinic = clinicService.save(clinic);
 
