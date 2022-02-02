@@ -109,6 +109,10 @@ public class AppointmentServiceImpl implements AppointmentService {
 
 	private boolean checkAvailability(User doctor, Clinic clinic, LocalDateTime dateTime, AppointmentType type) {
 
+		if(dateTime.isBefore(LocalDateTime.now())) {
+			return false;
+		}
+		
 		if (dateTime.getDayOfWeek().equals(DayOfWeek.SATURDAY) || dateTime.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
 			return false;
 		}
@@ -130,6 +134,10 @@ public class AppointmentServiceImpl implements AppointmentService {
 
 	private boolean checkAvailability(User doctor, Clinic clinic, LocalDate date, AppointmentType type) {
 
+		if(date.isBefore(LocalDate.now())) {
+			return false;
+		}
+		
 		if (date.getDayOfWeek().equals(DayOfWeek.SATURDAY) || date.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
 			return false;
 		}
