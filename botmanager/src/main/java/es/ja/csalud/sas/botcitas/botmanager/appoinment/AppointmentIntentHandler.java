@@ -353,6 +353,8 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 		// Read time from request
 		LocalTime time = readTimeParameter(request.getParameter("time")); //$NON-NLS-1$
 
+		time=adjustTime(time);
+		
 		// Write time into context
 		putTimeParameter(creatingAppointmentContext, "time", time);
 
@@ -383,6 +385,25 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 		ActionResponse actionResponse = builder.build();
 		return actionResponse;
 
+	}
+
+	/**
+	 * This function changes the time if necessary to address AM/PM daily cycle, according the following mapping 
+	 * 1<=time<=7 -> time=time+12
+	 * 8<=tim<=19 -> time=time
+	 * 20<=time<=23 -> time=time-12
+	 * @param time
+	 * @return 
+	 */
+	private LocalTime adjustTime(LocalTime time) {
+		
+		if(time.getHour()<=7) {
+			return time.plusHours(12);
+		} else if(time.getHour()>=20) {
+			return time.minusHours(12);
+		} else return time;
+		
+		
 	}
 
 	/**
