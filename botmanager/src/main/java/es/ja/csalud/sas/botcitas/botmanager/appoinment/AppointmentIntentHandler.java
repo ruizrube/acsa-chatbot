@@ -317,7 +317,7 @@ public class AppointmentIntentHandler extends DialogFlowHandler {
 
 					builder.add(creatingAppointmentContext);
 
-					builder.add(
+					builder.add("Para " + renderDate(date) + ", " + 
 							AgentResponses.getString("Responses.AVAILABLE_HOURS_SLOTS_1") + renderHours(availableHours) //$NON-NLS-1$
 									+ AgentResponses.getString("Responses.AVAILABLE_HOURS_SLOTS_2"));
 				} else {
