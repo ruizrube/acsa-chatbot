@@ -12,18 +12,18 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.ja.csalud.sas.botcitas.botmanager.appoinment.Appointment;
-import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentNotAvailableException;
-import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentNotFoundException;
 import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentService;
-import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentStatus;
-import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentType;
-import es.ja.csalud.sas.botcitas.botmanager.clinic.Clinic;
-import es.ja.csalud.sas.botcitas.botmanager.user.User;
-import es.ja.csalud.sas.botcitas.botmanager.user.UserNotAssignedToClinicException;
-import es.ja.csalud.sas.botcitas.botmanager.user.UserNotAssignedToDoctorException;
-import es.ja.csalud.sas.botcitas.botmanager.user.UserNotFoundException;
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.domain.Appointment;
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.domain.AppointmentNotAvailableException;
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.domain.AppointmentNotFoundException;
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.domain.AppointmentStatus;
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.domain.AppointmentType;
+import es.ja.csalud.sas.botcitas.botmanager.clinic.domain.Clinic;
 import es.ja.csalud.sas.botcitas.botmanager.user.UserService;
+import es.ja.csalud.sas.botcitas.botmanager.user.domain.User;
+import es.ja.csalud.sas.botcitas.botmanager.user.domain.UserNotAssignedToClinicException;
+import es.ja.csalud.sas.botcitas.botmanager.user.domain.UserNotAssignedToDoctorException;
+import es.ja.csalud.sas.botcitas.botmanager.user.domain.UserNotFoundException;
 
 @Service
 public class AppointmentServiceImpl implements AppointmentService {

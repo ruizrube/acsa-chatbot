@@ -1,4 +1,4 @@
-package es.ja.csalud.sas.botcitas.botmanager.clinic;
+package es.ja.csalud.sas.botcitas.botmanager.clinic.domain;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

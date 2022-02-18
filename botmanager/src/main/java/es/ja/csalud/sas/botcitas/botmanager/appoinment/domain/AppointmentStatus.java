@@ -1,4 +1,4 @@
-package es.ja.csalud.sas.botcitas.botmanager.appoinment;
+package es.ja.csalud.sas.botcitas.botmanager.appoinment.domain;
 
 public enum AppointmentStatus {
 

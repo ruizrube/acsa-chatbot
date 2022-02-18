@@ -6,9 +6,9 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import es.ja.csalud.sas.botcitas.botmanager.appoinment.Appointment;
-import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentStatus;
-import es.ja.csalud.sas.botcitas.botmanager.user.User;
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.domain.Appointment;
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.domain.AppointmentStatus;
+import es.ja.csalud.sas.botcitas.botmanager.user.domain.User;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, String>{
 

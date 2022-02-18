@@ -1,7 +1,7 @@
 /**
  * 
  */
-package es.ja.csalud.sas.botcitas.botmanager.clinic;
+package es.ja.csalud.sas.botcitas.botmanager.clinic.intenthandlers;
 
 import java.util.Optional;
 
@@ -10,36 +10,26 @@ import org.springframework.stereotype.Component;
 
 import com.google.actions.api.ActionContext;
 import com.google.actions.api.ActionRequest;
-import com.google.actions.api.ActionResponse;
-import com.google.actions.api.ForIntent;
 import com.google.actions.api.response.ResponseBuilder;
 
 import es.ja.csalud.sas.botcitas.botmanager.AgentResponses;
-import es.ja.csalud.sas.botcitas.botmanager.DialogFlowHandler;
-import es.ja.csalud.sas.botcitas.botmanager.user.User;
+import es.ja.csalud.sas.botcitas.botmanager.DialogFlowIntents;
+import es.ja.csalud.sas.botcitas.botmanager.clinic.domain.Clinic;
 import es.ja.csalud.sas.botcitas.botmanager.user.UserService;
+import es.ja.csalud.sas.botcitas.botmanager.user.domain.User;
 
 /**
  * @author ivanruizrube
  *
  */
 @Component
-public class ClinicIntentHandler extends DialogFlowHandler {
+public class GetUserClinicIntentHandler extends DialogFlowIntents {
 
 	@Autowired
 	private UserService userService;
 
-	@Autowired
-	private ClinicService clinicService;
-
-	/**
-	 * Webhook for querying the user's clinic
-	 * 
-	 * @param request
-	 * @return
-	 */
-	@ForIntent("general.clinic")
-	public ActionResponse retrieveUserClinic(ActionRequest request) {
+	
+	public ResponseBuilder getUserClinic(ActionRequest request) {
 
 		ResponseBuilder builder = getResponseBuilder(request);
 
@@ -56,20 +46,20 @@ public class ClinicIntentHandler extends DialogFlowHandler {
 				String result = AgentResponses.getString("Responses.USER_CLINIC_1") + theClinic.getName()
 						+ AgentResponses.getString("Responses.USER_CLINIC_2") + theClinic.getAddress()
 						+ AgentResponses.getString("Responses.USER_CLINIC_3") + theClinic.getPhone();
-				builder.add(result); // $NON-NLS-1$
+				builder.add(result);
 
 			} else {
-				builder.add(AgentResponses.getString("Responses.USER_NO_ASSIGNED_TO_CLINIC")); //$NON-NLS-1$
+				builder.add(AgentResponses.getString("Responses.USER_NO_ASSIGNED_TO_CLINIC"));
 
 			}
 
 		} else {
-			builder.add(AgentResponses.getString("Responses.USER_NOT_FOUND")); //$NON-NLS-1$
+			builder.add(AgentResponses.getString("Responses.USER_NOT_FOUND"));
 		}
 
-		ActionResponse actionResponse = builder.build();
-
-		return actionResponse;
+		
+		return builder;
 
 	}
+
 }

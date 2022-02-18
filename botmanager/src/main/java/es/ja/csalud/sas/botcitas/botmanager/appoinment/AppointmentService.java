@@ -8,9 +8,13 @@ import java.util.Optional;
 
 import org.springframework.transaction.annotation.Transactional;
 
-import es.ja.csalud.sas.botcitas.botmanager.user.UserNotAssignedToClinicException;
-import es.ja.csalud.sas.botcitas.botmanager.user.UserNotAssignedToDoctorException;
-import es.ja.csalud.sas.botcitas.botmanager.user.UserNotFoundException;
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.domain.Appointment;
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.domain.AppointmentNotAvailableException;
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.domain.AppointmentNotFoundException;
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.domain.AppointmentType;
+import es.ja.csalud.sas.botcitas.botmanager.user.domain.UserNotAssignedToClinicException;
+import es.ja.csalud.sas.botcitas.botmanager.user.domain.UserNotAssignedToDoctorException;
+import es.ja.csalud.sas.botcitas.botmanager.user.domain.UserNotFoundException;
 
 public interface AppointmentService {
 

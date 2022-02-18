@@ -1,4 +1,4 @@
-package es.ja.csalud.sas.botcitas.botmanager.user;
+package es.ja.csalud.sas.botcitas.botmanager.user.domain;
 
 import java.util.Optional;
 
@@ -11,7 +11,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import es.ja.csalud.sas.botcitas.botmanager.clinic.Clinic;
+import es.ja.csalud.sas.botcitas.botmanager.clinic.domain.Clinic;
 
 @Entity
 public class User {

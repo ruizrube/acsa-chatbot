@@ -5,8 +5,8 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import es.ja.csalud.sas.botcitas.botmanager.clinic.Clinic;
 import es.ja.csalud.sas.botcitas.botmanager.clinic.ClinicService;
+import es.ja.csalud.sas.botcitas.botmanager.clinic.domain.Clinic;
 
 @Service
 public class ClinicServiceImpl implements ClinicService {

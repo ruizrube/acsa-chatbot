@@ -1,8 +1,8 @@
-package es.ja.csalud.sas.botcitas.botmanager.appoinment;
+package es.ja.csalud.sas.botcitas.botmanager.appoinment.domain;
 
 import java.time.LocalDateTime;
 
-import es.ja.csalud.sas.botcitas.botmanager.user.User;
+import es.ja.csalud.sas.botcitas.botmanager.user.domain.User;
 
 public class AppointmentNotAvailableException  extends Exception {
 	

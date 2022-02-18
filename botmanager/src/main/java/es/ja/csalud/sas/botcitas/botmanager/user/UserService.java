@@ -3,6 +3,8 @@ package es.ja.csalud.sas.botcitas.botmanager.user;
 import java.util.List;
 import java.util.Optional;
 
+import es.ja.csalud.sas.botcitas.botmanager.user.domain.User;
+
 public interface UserService {
 
 	User save(User user);

@@ -5,8 +5,8 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import es.ja.csalud.sas.botcitas.botmanager.user.User;
 import es.ja.csalud.sas.botcitas.botmanager.user.UserService;
+import es.ja.csalud.sas.botcitas.botmanager.user.domain.User;
 
 @Service
 public class UserServiceImpl implements UserService {

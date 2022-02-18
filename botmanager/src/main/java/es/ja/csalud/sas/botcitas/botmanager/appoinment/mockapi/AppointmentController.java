@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import es.ja.csalud.sas.botcitas.botmanager.appoinment.Appointment;
-import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentNotAvailableException;
-import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentNotFoundException;
 import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentService;
-import es.ja.csalud.sas.botcitas.botmanager.appoinment.AppointmentType;
-import es.ja.csalud.sas.botcitas.botmanager.user.UserNotFoundException;
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.domain.Appointment;
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.domain.AppointmentNotAvailableException;
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.domain.AppointmentNotFoundException;
+import es.ja.csalud.sas.botcitas.botmanager.appoinment.domain.AppointmentType;
+import es.ja.csalud.sas.botcitas.botmanager.user.domain.UserNotFoundException;
 
 @RestController
 class AppointmentController {

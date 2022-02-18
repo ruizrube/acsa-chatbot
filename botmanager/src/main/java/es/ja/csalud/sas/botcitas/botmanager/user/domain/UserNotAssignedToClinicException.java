@@ -1,4 +1,4 @@
-package es.ja.csalud.sas.botcitas.botmanager.user;
+package es.ja.csalud.sas.botcitas.botmanager.user.domain;
 
 public class UserNotAssignedToClinicException extends Exception {
 	public UserNotAssignedToClinicException(String userIdentifier) {

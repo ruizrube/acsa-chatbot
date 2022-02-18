@@ -4,10 +4,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
-import es.ja.csalud.sas.botcitas.botmanager.clinic.Clinic;
 import es.ja.csalud.sas.botcitas.botmanager.clinic.ClinicService;
-import es.ja.csalud.sas.botcitas.botmanager.user.User;
+import es.ja.csalud.sas.botcitas.botmanager.clinic.domain.Clinic;
 import es.ja.csalud.sas.botcitas.botmanager.user.UserService;
+import es.ja.csalud.sas.botcitas.botmanager.user.domain.User;
 
 @Component
 public class UserDataGenerator {

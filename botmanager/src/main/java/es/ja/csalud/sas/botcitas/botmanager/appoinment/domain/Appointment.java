@@ -1,4 +1,4 @@
-package es.ja.csalud.sas.botcitas.botmanager.appoinment;
+package es.ja.csalud.sas.botcitas.botmanager.appoinment.domain;
 
 import java.time.LocalDateTime;
 
@@ -13,8 +13,8 @@ import org.hibernate.annotations.GenericGenerator;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import es.ja.csalud.sas.botcitas.botmanager.clinic.Clinic;
-import es.ja.csalud.sas.botcitas.botmanager.user.User;
+import es.ja.csalud.sas.botcitas.botmanager.clinic.domain.Clinic;
+import es.ja.csalud.sas.botcitas.botmanager.user.domain.User;
 
 @Entity
 public class Appointment {
