@@ -26,14 +26,14 @@ import es.ja.csalud.sas.botcitas.botmanager.domain.model.Appointment;
 import es.ja.csalud.sas.botcitas.botmanager.domain.model.AppointmentType;
 import es.ja.csalud.sas.botcitas.botmanager.domain.services.AppointmentService;
 import es.ja.csalud.sas.botcitas.botmanager.intents.AgentResponses;
-import es.ja.csalud.sas.botcitas.botmanager.intents.DialogFlowIntents;
+import es.ja.csalud.sas.botcitas.botmanager.intents.BotManagerBaseHandler;
 
 /**
  * @author ivanruizrube
  *
  */
 @Component
-public class RequestAppointmentIntentHandler extends DialogFlowIntents {
+public class RequestAppointmentIntentHandler extends BotManagerBaseHandler {
 
 	@Autowired
 	private AppointmentService appointmentService;

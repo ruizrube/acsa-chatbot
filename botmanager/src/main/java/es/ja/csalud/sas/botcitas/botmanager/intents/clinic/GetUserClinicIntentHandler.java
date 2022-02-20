@@ -16,14 +16,14 @@ import es.ja.csalud.sas.botcitas.botmanager.domain.model.Clinic;
 import es.ja.csalud.sas.botcitas.botmanager.domain.model.User;
 import es.ja.csalud.sas.botcitas.botmanager.domain.services.UserService;
 import es.ja.csalud.sas.botcitas.botmanager.intents.AgentResponses;
-import es.ja.csalud.sas.botcitas.botmanager.intents.DialogFlowIntents;
+import es.ja.csalud.sas.botcitas.botmanager.intents.BotManagerBaseHandler;
 
 /**
  * @author ivanruizrube
  *
  */
 @Component
-public class GetUserClinicIntentHandler extends DialogFlowIntents {
+public class GetUserClinicIntentHandler extends BotManagerBaseHandler {
 
 	@Autowired
 	private UserService userService;

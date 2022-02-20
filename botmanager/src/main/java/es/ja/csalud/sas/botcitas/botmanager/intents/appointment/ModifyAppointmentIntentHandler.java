@@ -16,14 +16,14 @@ import es.ja.csalud.sas.botcitas.botmanager.domain.exceptions.UserNotFoundExcept
 import es.ja.csalud.sas.botcitas.botmanager.domain.model.Appointment;
 import es.ja.csalud.sas.botcitas.botmanager.domain.services.AppointmentService;
 import es.ja.csalud.sas.botcitas.botmanager.intents.AgentResponses;
-import es.ja.csalud.sas.botcitas.botmanager.intents.DialogFlowIntents;
+import es.ja.csalud.sas.botcitas.botmanager.intents.BotManagerBaseHandler;
 
 /**
  * @author ivanruizrube
  *
  */
 @Component
-public class ModifyAppointmentIntentHandler extends DialogFlowIntents {
+public class ModifyAppointmentIntentHandler extends BotManagerBaseHandler {
 
 	@Autowired
 	private AppointmentService appointmentService;

@@ -25,7 +25,7 @@ import com.google.gson.internal.LinkedTreeMap;
 import es.ja.csalud.sas.botcitas.botmanager.domain.model.Appointment;
 import es.ja.csalud.sas.botcitas.botmanager.domain.model.AppointmentType;
 
-public abstract class DialogFlowIntents extends DialogflowApp {
+public abstract class BotManagerBaseHandler extends DialogflowApp {
 
 	protected static final String EVENT_CANCEL_APPOINTMENT = "CANCEL_APPOINTMENT";
 
@@ -57,11 +57,11 @@ public abstract class DialogFlowIntents extends DialogflowApp {
 
 	protected static final Integer LIFESPAN = 20;
 
-	protected DateTimeFormatter isoDateTimeFormatter = DateTimeFormatter.ISO_DATE_TIME;
+	protected static DateTimeFormatter isoDateTimeFormatter = DateTimeFormatter.ISO_DATE_TIME;
 
-	protected DateTimeFormatter isoDateFormatter = DateTimeFormatter.ISO_DATE;
+	protected static DateTimeFormatter isoDateFormatter = DateTimeFormatter.ISO_DATE;
 
-	private DateTimeFormatter isoTimeFormatter = DateTimeFormatter.ISO_TIME;
+	protected static DateTimeFormatter isoTimeFormatter = DateTimeFormatter.ISO_TIME;
 
 	protected ActionResponse applyPreconditions(ActionRequest request, Function e, String lastActionEvent) {
 		ResponseBuilder builder;
@@ -153,7 +153,7 @@ public abstract class DialogFlowIntents extends DialogflowApp {
 		builder.removeContext(CONTEXT_USER_CONSENT);
 		builder.removeContext(CONTEXT_USER_ACTIVATED);
 		builder.removeContext(CONTEXT_APPOINTMENT_CREATING);
-
+		builder.removeContext(CONTEXT_LAST_USER_ACTION);
 	}
 
 	/**
@@ -246,7 +246,7 @@ public abstract class DialogFlowIntents extends DialogflowApp {
 			result = LocalTime.parse(readStringParameter(parameter), isoDateTimeFormatter);
 
 		}
-		
+
 		return adjustTime(result);
 	}
 
@@ -307,8 +307,7 @@ public abstract class DialogFlowIntents extends DialogflowApp {
 		context.setParameters(params);
 
 	}
-	
-	
+
 	/**
 	 * This function changes the time if necessary to address AM/PM daily cycle,
 	 * according the following mapping 1<=time<=7 -> time=time+12 8<=tim<=19 ->
@@ -327,4 +326,5 @@ public abstract class DialogFlowIntents extends DialogflowApp {
 			return time;
 
 	}
+
 }

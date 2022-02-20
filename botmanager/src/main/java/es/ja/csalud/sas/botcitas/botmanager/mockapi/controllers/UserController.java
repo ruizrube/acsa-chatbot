@@ -8,14 +8,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.ja.csalud.sas.botcitas.botmanager.domain.model.User;
-import es.ja.csalud.sas.botcitas.botmanager.domain.services.UserService;
+import es.ja.csalud.sas.botcitas.botmanager.mockapi.services.UserServiceImpl;
 
 @RestController
 class UserController {
 
-	private final UserService service;
+	private final UserServiceImpl service;
 
-	UserController(UserService service) {
+	UserController(UserServiceImpl service) {
 		this.service = service;
 	}
 

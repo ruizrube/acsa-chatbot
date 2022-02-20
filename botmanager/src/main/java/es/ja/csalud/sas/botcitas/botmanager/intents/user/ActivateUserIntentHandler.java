@@ -10,21 +10,19 @@ import org.springframework.stereotype.Component;
 
 import com.google.actions.api.ActionContext;
 import com.google.actions.api.ActionRequest;
-import com.google.actions.api.ActionResponse;
-import com.google.actions.api.ForIntent;
 import com.google.actions.api.response.ResponseBuilder;
 
 import es.ja.csalud.sas.botcitas.botmanager.domain.model.User;
 import es.ja.csalud.sas.botcitas.botmanager.domain.services.UserService;
 import es.ja.csalud.sas.botcitas.botmanager.intents.AgentResponses;
-import es.ja.csalud.sas.botcitas.botmanager.intents.DialogFlowIntents;
+import es.ja.csalud.sas.botcitas.botmanager.intents.BotManagerBaseHandler;
 
 /**
  * @author ivanruizrube
  *
  */
 @Component
-public class ActivateUserIntentHandler extends DialogFlowIntents {
+public class ActivateUserIntentHandler extends BotManagerBaseHandler {
 
 	@Autowired
 	private UserService userService;

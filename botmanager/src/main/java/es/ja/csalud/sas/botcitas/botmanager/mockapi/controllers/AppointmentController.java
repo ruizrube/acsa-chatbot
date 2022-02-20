@@ -18,13 +18,14 @@ import es.ja.csalud.sas.botcitas.botmanager.domain.exceptions.UserNotFoundExcept
 import es.ja.csalud.sas.botcitas.botmanager.domain.model.Appointment;
 import es.ja.csalud.sas.botcitas.botmanager.domain.model.AppointmentType;
 import es.ja.csalud.sas.botcitas.botmanager.domain.services.AppointmentService;
+import es.ja.csalud.sas.botcitas.botmanager.mockapi.services.AppointmentServiceImpl;
 
 @RestController
 class AppointmentController {
 
-	private final AppointmentService service;
+	private final AppointmentServiceImpl service;
 
-	AppointmentController(AppointmentService service) {
+	AppointmentController(AppointmentServiceImpl service) {
 		this.service = service;
 	}
 

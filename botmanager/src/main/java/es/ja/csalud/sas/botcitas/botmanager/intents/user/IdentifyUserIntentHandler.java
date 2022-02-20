@@ -22,14 +22,14 @@ import es.ja.csalud.sas.botcitas.botmanager.domain.model.User;
 import es.ja.csalud.sas.botcitas.botmanager.domain.services.AppointmentService;
 import es.ja.csalud.sas.botcitas.botmanager.domain.services.UserService;
 import es.ja.csalud.sas.botcitas.botmanager.intents.AgentResponses;
-import es.ja.csalud.sas.botcitas.botmanager.intents.DialogFlowIntents;
+import es.ja.csalud.sas.botcitas.botmanager.intents.BotManagerBaseHandler;
 
 /**
  * @author ivanruizrube
  *
  */
 @Component
-public class IdentifyUserIntentHandler extends DialogFlowIntents {
+public class IdentifyUserIntentHandler extends BotManagerBaseHandler {
 
 	@Autowired
 	private UserService userService;

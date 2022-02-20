@@ -8,14 +8,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.ja.csalud.sas.botcitas.botmanager.domain.model.Clinic;
-import es.ja.csalud.sas.botcitas.botmanager.domain.services.ClinicService;
+import es.ja.csalud.sas.botcitas.botmanager.mockapi.services.ClinicServiceImpl;
 
 @RestController
 class ClinicController {
 
-	private final ClinicService service;
+	private final ClinicServiceImpl service;
 
-	ClinicController(ClinicService service) {
+	ClinicController(ClinicServiceImpl service) {
 		this.service = service;
 	}
 

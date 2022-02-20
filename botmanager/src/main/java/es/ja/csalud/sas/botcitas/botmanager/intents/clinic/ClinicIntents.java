@@ -10,14 +10,14 @@ import com.google.actions.api.ActionRequest;
 import com.google.actions.api.ActionResponse;
 import com.google.actions.api.ForIntent;
 
-import es.ja.csalud.sas.botcitas.botmanager.intents.DialogFlowIntents;
+import es.ja.csalud.sas.botcitas.botmanager.intents.BotManagerBaseHandler;
 
 /**
  * @author ivanruizrube
  *
  */
 @Component
-public class ClinicIntents extends DialogFlowIntents {
+public class ClinicIntents extends BotManagerBaseHandler {
 
 	@Autowired
 	private GetUserClinicIntentHandler getUserClinicIntentHandler;

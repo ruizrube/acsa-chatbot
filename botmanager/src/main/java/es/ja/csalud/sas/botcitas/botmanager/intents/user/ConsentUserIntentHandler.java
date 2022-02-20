@@ -15,14 +15,14 @@ import com.google.actions.api.response.ResponseBuilder;
 import es.ja.csalud.sas.botcitas.botmanager.domain.model.User;
 import es.ja.csalud.sas.botcitas.botmanager.domain.services.UserService;
 import es.ja.csalud.sas.botcitas.botmanager.intents.AgentResponses;
-import es.ja.csalud.sas.botcitas.botmanager.intents.DialogFlowIntents;
+import es.ja.csalud.sas.botcitas.botmanager.intents.BotManagerBaseHandler;
 
 /**
  * @author ivanruizrube
  *
  */
 @Component
-public class ConsentUserIntentHandler extends DialogFlowIntents {
+public class ConsentUserIntentHandler extends BotManagerBaseHandler {
 
 	@Autowired
 	private UserService userService;
