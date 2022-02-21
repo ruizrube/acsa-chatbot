@@ -55,7 +55,7 @@ public abstract class BotManagerBaseHandler extends DialogflowApp {
 
 	protected static final String CONTEXT_APPOINTMENT_CREATING = "appointment-creating";
 
-	protected static final Integer LIFESPAN = 20;
+	protected static final Integer LIFESPAN = 50;
 
 	protected static DateTimeFormatter isoDateTimeFormatter = DateTimeFormatter.ISO_DATE_TIME;
 

@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
 	
 	@Override
 	public Optional<User> findByIdentifier(String identifier) {
-		identifier=identifier.replace("AN","").trim();
+		identifier=identifier.replace("AN","").replace(" ","");
 		return userRepository.findByIdentityDocumentOrNuhsa(identifier,identifier);
 	}
 
@@ -42,7 +42,6 @@ public class UserServiceImpl implements UserService {
 	public List<User> findAll() {
 		return userRepository.findAll();
 	}
-
 
 	
 }
