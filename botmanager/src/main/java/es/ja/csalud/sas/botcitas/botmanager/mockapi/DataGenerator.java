@@ -1,19 +1,47 @@
 package es.ja.csalud.sas.botcitas.botmanager.mockapi;
 
+import java.util.List;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import es.ja.csalud.sas.botcitas.botmanager.domain.model.Clinic;
 import es.ja.csalud.sas.botcitas.botmanager.domain.model.User;
 import es.ja.csalud.sas.botcitas.botmanager.domain.services.ClinicService;
 import es.ja.csalud.sas.botcitas.botmanager.domain.services.UserService;
+import es.ja.csalud.sas.botcitas.botmanager.mockapi.services.AppointmentServiceImpl;
 
 @Component
 public class DataGenerator {
 
+	
+	private UserService userService;
+	private ClinicService clinicService;
+	private AppointmentServiceImpl appointmentService;
+
+
+	@Scheduled(cron = "0 0 8,16 * * ?", zone = "Europe/Paris")
+	public void resetData() {
+		System.out.println(">>>>Cleaning appointment database....");
+		List<User> users = userService.findAll();
+		
+		for(User user:users) {
+			user.setAcceptConditions(false);
+			user.setEnabled(false);
+			userService.save(user);
+		}
+		
+		appointmentService.deleteAll();
+	}
+	
+	
 	@Bean
-	public CommandLineRunner loadUserData(UserService userService, ClinicService clinicService) {
+	public CommandLineRunner loadUserData(AppointmentServiceImpl appointmentService, UserService userService, ClinicService clinicService) {
+		this.appointmentService = appointmentService;
+		this.userService = userService;
+		this.clinicService = clinicService;
 		return args -> {
 
 			if (clinicService.count() == 0) {

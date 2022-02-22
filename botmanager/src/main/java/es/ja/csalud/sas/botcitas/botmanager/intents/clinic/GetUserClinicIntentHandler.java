@@ -48,6 +48,8 @@ public class GetUserClinicIntentHandler extends BotManagerBaseHandler {
 						+ AgentResponses.getString("Responses.USER_CLINIC_3") + theClinic.getPhone();
 				builder.add(result);
 
+				
+				
 			} else {
 				builder.add(AgentResponses.getString("Responses.USER_NO_ASSIGNED_TO_CLINIC"));
 

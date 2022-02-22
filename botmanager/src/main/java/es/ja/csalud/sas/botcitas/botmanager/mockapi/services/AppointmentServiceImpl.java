@@ -35,6 +35,12 @@ public class AppointmentServiceImpl implements AppointmentService {
 	public AppointmentServiceImpl(UserService userService, AppointmentRepository appointmentRepository) {
 		this.userService = userService;
 		this.appointmentRepository = appointmentRepository;
+		
+	}
+	
+	
+	public void deleteAll() {
+		appointmentRepository.deleteAll();
 	}
 
 	@Override
@@ -247,4 +253,6 @@ public class AppointmentServiceImpl implements AppointmentService {
 
 	}
 
+
+	
 }
